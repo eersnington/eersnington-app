@@ -89,8 +89,7 @@ jobs:
           for package_name in sreenarayanan eersnington; do
             npm pkg set "name=${package_name}"
             npm pkg set "version=${INPUT_VERSION}"
-            npm pkg delete bin
-            npm pkg set "bin.${package_name}=./dist/index.js"
+            npm pkg set "bin=./dist/index.js"
 
             printf 'Publishing %s@%s from apps/tui\n' "${package_name}" "${INPUT_VERSION}"
             npm publish --provenance --tag "${NPM_TAG}" --ignore-scripts
