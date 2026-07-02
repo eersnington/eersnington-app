@@ -126,10 +126,65 @@ jobs:
           name: npm-packages
           path: release-artifacts
 
-      - name: Publish npm packages (OIDC, no token)
+      - name: Resolve downloaded tarballs
         env:
           INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { appendFileSync, readdirSync, statSync } from "node:fs";
+          import { join } from "node:path";
+
+          const artifactDir = "release-artifacts";
+          const version = process.env.INPUT_VERSION;
+          const githubEnv = process.env.GITHUB_ENV;
+
+          if (!version) {
+            console.error("INPUT_VERSION is missing. Cannot resolve npm package tarballs.");
+            process.exit(1);
+          }
+
+          if (!githubEnv) {
+            console.error("GITHUB_ENV is missing. Cannot pass tarball paths to the publish step.");
+            process.exit(1);
+          }
+
+          function listFiles(directory) {
+            return readdirSync(directory).flatMap((entry) => {
+              const path = join(directory, entry);
+              return statSync(path).isDirectory() ? listFiles(path) : [path];
+            });
+          }
+
+          const tarballs = listFiles(artifactDir).filter((path) => path.endsWith(".tgz")).sort();
+
+          console.log("Downloaded npm package tarballs:");
+          for (const tarball of tarballs) {
+            console.log(`- ${tarball}`);
+          }
+
+          const targets = [
+            ["sreenarayanan", "SREENARAYANAN_TARBALL"],
+            ["eersnington", "EERSNINGTON_TARBALL"],
+          ];
+
+          for (const [packageName, envName] of targets) {
+            const expectedFileName = `${packageName}-${version}.tgz`;
+            const matches = tarballs.filter((path) => path.endsWith(expectedFileName));
+
+            if (matches.length !== 1) {
+              console.error(
+                `Expected exactly one downloaded tarball named ${expectedFileName}, found ${matches.length}. No package was published.`,
+              );
+              process.exit(1);
+            }
+
+            appendFileSync(githubEnv, `${envName}=${matches[0]}\n`);
+          }
+          NODE
+
+      - name: Publish npm packages (OIDC, no token)
+        env:
           NPM_TAG: ${{ inputs.npm_tag }}
         run: |
-          npm publish "release-artifacts/sreenarayanan-${INPUT_VERSION}.tgz" --provenance --tag "${NPM_TAG}" --ignore-scripts
-          npm publish "release-artifacts/eersnington-${INPUT_VERSION}.tgz" --provenance --tag "${NPM_TAG}" --ignore-scripts
+          npm publish "${SREENARAYANAN_TARBALL}" --provenance --tag "${NPM_TAG}" --ignore-scripts
+          npm publish "${EERSNINGTON_TARBALL}" --provenance --tag "${NPM_TAG}" --ignore-scripts
