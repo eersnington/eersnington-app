@@ -2,8 +2,8 @@
  * Keyboard event handling utilities
  */
 
-import { KEYBIND_PATTERNS } from '../constants';
-import type { KeyboardEvent } from '../types';
+import { KEYBIND_PATTERNS } from "../constants";
+import type { KeyboardEvent } from "../types";
 
 /**
  * Check if the pressed key is a navigation key
@@ -11,11 +11,7 @@ import type { KeyboardEvent } from '../types';
  * @returns true if it's a navigation key
  */
 export const isNavigationKey = (key: string): boolean => {
-  return [
-    ...KEYBIND_PATTERNS.ARROW_KEYS,
-    ...KEYBIND_PATTERNS.VIM_NAVIGATION,
-    ' ',
-  ].includes(key);
+  return [...KEYBIND_PATTERNS.ARROW_KEYS, ...KEYBIND_PATTERNS.VIM_NAVIGATION, " "].includes(key);
 };
 
 /**
@@ -34,10 +30,10 @@ export const isModalKey = (key: string): boolean => {
  */
 export const toVimKey = (key: string): string => {
   const keyMap = {
-    ArrowUp: 'k',
-    ArrowDown: 'j',
-    ArrowLeft: 'h',
-    ArrowRight: 'l',
+    ArrowUp: "k",
+    ArrowDown: "j",
+    ArrowLeft: "h",
+    ArrowRight: "l",
   } as const;
 
   return keyMap[key as keyof typeof keyMap] ?? key;
@@ -49,9 +45,7 @@ export const toVimKey = (key: string): string => {
  * @returns true if target is input or textarea
  */
 export const isInputTarget = (target: EventTarget | null): boolean => {
-  return (
-    target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement
-  );
+  return target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement;
 };
 
 /**
@@ -60,7 +54,7 @@ export const isInputTarget = (target: EventTarget | null): boolean => {
  * @returns true if it's the help keybind
  */
 export const isHelpKeybind = (event: KeyboardEvent): boolean => {
-  return event.key === '?' && event.shiftKey;
+  return event.key === "?" && event.shiftKey;
 };
 
 /**
@@ -69,7 +63,7 @@ export const isHelpKeybind = (event: KeyboardEvent): boolean => {
  * @returns true if it's the theme toggle keybind
  */
 export const isThemeToggleKeybind = (event: KeyboardEvent): boolean => {
-  return event.shiftKey && (event.key === 'T' || event.key === 't');
+  return event.shiftKey && (event.key === "T" || event.key === "t");
 };
 
 /**
@@ -78,7 +72,7 @@ export const isThemeToggleKeybind = (event: KeyboardEvent): boolean => {
  * @returns true if it's the escape key
  */
 export const isEscapeKey = (key: string): boolean => {
-  return key === 'Escape';
+  return key === "Escape";
 };
 
 /**
@@ -87,7 +81,7 @@ export const isEscapeKey = (key: string): boolean => {
  * @returns true if it's an up navigation key
  */
 export const isUpKey = (key: string): boolean => {
-  return key === 'k' || key === 'ArrowUp';
+  return key === "k" || key === "ArrowUp";
 };
 
 /**
@@ -96,7 +90,7 @@ export const isUpKey = (key: string): boolean => {
  * @returns true if it's a down navigation key
  */
 export const isDownKey = (key: string): boolean => {
-  return key === 'j' || key === 'ArrowDown';
+  return key === "j" || key === "ArrowDown";
 };
 
 /**
@@ -105,7 +99,7 @@ export const isDownKey = (key: string): boolean => {
  * @returns true if it's the enter key
  */
 export const isEnterKey = (key: string): boolean => {
-  return key === 'Enter';
+  return key === "Enter";
 };
 
 /**

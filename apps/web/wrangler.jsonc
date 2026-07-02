@@ -1,23 +1,23 @@
 {
-	"name": "my-portfolio",
-	"main": ".svelte-kit/cloudflare/_worker.js",
-	"compatibility_flags": ["nodejs_als"],
-	"compatibility_date": "2026-02-04",
-	"assets": {
-		"binding": "ASSETS",
-		"directory": ".svelte-kit/cloudflare"
-	},
-	"routes": [
-		{
-			"pattern": "www.eers.dev",
-			"custom_domain": true
-		},
-		{
-			"pattern": "eers.dev",
-			"custom_domain": true
-		}
-	],
-	"observability": {
-		"enabled": true
-	}
+  "name": "my-portfolio",
+  "main": ".svelte-kit/cloudflare/_worker.js",
+  "compatibility_flags": ["nodejs_als"],
+  "compatibility_date": "2026-02-04",
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".svelte-kit/cloudflare",
+  },
+  "routes": [
+    {
+      "pattern": "www.eers.dev",
+      "custom_domain": true,
+    },
+    {
+      "pattern": "eers.dev",
+      "custom_domain": true,
+    },
+  ],
+  "observability": {
+    "enabled": true,
+  },
 }

@@ -197,7 +197,8 @@ function isEnterKey(event: KeyEventLike): boolean {
 }
 
 function openExternalUrl(url: string): void {
-  const opener = process.platform === "darwin" ? "open" : process.platform === "win32" ? "cmd" : "xdg-open";
+  const opener =
+    process.platform === "darwin" ? "open" : process.platform === "win32" ? "cmd" : "xdg-open";
   const args = process.platform === "win32" ? ["/c", "start", "", url] : [url];
 
   Bun.spawn([opener, ...args], {
@@ -256,7 +257,7 @@ function App() {
         blockquote: { fg: colors.lineNumbers, italic: true },
         link: { fg: colors.accent, underline: true },
       }),
-    [colors]
+    [colors],
   );
 
   const loadSkill = useCallback(() => {
@@ -301,28 +302,31 @@ function App() {
       openExternalUrl(link.url);
       showStatusMessage({ text: `Opening ${link.title}...`, tone: "info" });
     },
-    [openSkillView, showStatusMessage]
+    [openSkillView, showStatusMessage],
   );
 
-  const appendKeyBuffer = useCallback((key: string) => {
-    setKeyBuffer((current) => {
-      const next = current.length > MAX_KEY_BUFFER_LENGTH ? key : current + key;
-      const matchedLink = LINKS.find((link) => next.endsWith(link.keybind));
+  const appendKeyBuffer = useCallback(
+    (key: string) => {
+      setKeyBuffer((current) => {
+        const next = current.length > MAX_KEY_BUFFER_LENGTH ? key : current + key;
+        const matchedLink = LINKS.find((link) => next.endsWith(link.keybind));
 
-      if (matchedLink) {
-        activateLink(matchedLink);
-        return "";
+        if (matchedLink) {
+          activateLink(matchedLink);
+          return "";
+        }
+
+        return next;
+      });
+
+      if (keyBufferTimer.current) {
+        clearTimeout(keyBufferTimer.current);
       }
 
-      return next;
-    });
-
-    if (keyBufferTimer.current) {
-      clearTimeout(keyBufferTimer.current);
-    }
-
-    keyBufferTimer.current = setTimeout(() => setKeyBuffer(""), KEY_BUFFER_TIMEOUT_MS);
-  }, [activateLink]);
+      keyBufferTimer.current = setTimeout(() => setKeyBuffer(""), KEY_BUFFER_TIMEOUT_MS);
+    },
+    [activateLink],
+  );
 
   useEffect(() => {
     return () => {
@@ -415,15 +419,17 @@ function App() {
 
   return (
     <box flexDirection="column" flexGrow={1} backgroundColor={colors.background}>
-    <box flexGrow={1} flexDirection="row" backgroundColor={colors.background}>
+      <box flexGrow={1} flexDirection="row" backgroundColor={colors.background}>
         <LineGutter height={Math.max(0, height - 1)} color={colors.lineNumbers} />
-        <box flexGrow={1} paddingLeft={2} paddingRight={2} paddingTop={1} backgroundColor={colors.background}>
+        <box
+          flexGrow={1}
+          paddingLeft={2}
+          paddingRight={2}
+          paddingTop={1}
+          backgroundColor={colors.background}
+        >
           {view === "home" ? (
-            <HomeView
-              colors={colors}
-              links={LINKS}
-              selectedIndex={selectedIndex}
-            />
+            <HomeView colors={colors} links={LINKS} selectedIndex={selectedIndex} />
           ) : null}
           {view === "skill" ? (
             <SkillView colors={colors} skillState={skillState} syntaxStyle={syntaxStyle} />
@@ -470,7 +476,13 @@ function HomeView({
 }) {
   return (
     <box flexGrow={1} justifyContent="center" alignItems="center" backgroundColor="transparent">
-      <box flexDirection="column" alignItems="center" gap={1} width={58} backgroundColor="transparent">
+      <box
+        flexDirection="column"
+        alignItems="center"
+        gap={1}
+        width={58}
+        backgroundColor="transparent"
+      >
         <box flexDirection="column" alignItems="center" backgroundColor="transparent">
           {SHORT_ASCII_TITLE.split("\n").map((line) => (
             <text key={line} fg={colors.accent} wrapMode="none">
@@ -478,7 +490,13 @@ function HomeView({
             </text>
           ))}
         </box>
-        <box paddingLeft={2} paddingRight={2} paddingTop={1} paddingBottom={1} backgroundColor={colors.selection}>
+        <box
+          paddingLeft={2}
+          paddingRight={2}
+          paddingTop={1}
+          paddingBottom={1}
+          backgroundColor={colors.selection}
+        >
           <text fg={colors.foreground}>{SUBTITLE} ▲</text>
         </box>
         <NavigationLinks colors={colors} links={links} selectedIndex={selectedIndex} />
@@ -514,7 +532,9 @@ function NavigationLinks({
             paddingRight={1}
             backgroundColor={active ? colors.selection : "transparent"}
           >
-            <text fg={active ? colors.accent : colors.foreground}>{prefix} {link.title}</text>
+            <text fg={active ? colors.accent : colors.foreground}>
+              {prefix} {link.title}
+            </text>
             <text fg={active ? colors.accent : colors.lineNumbers}>{link.keybind}</text>
           </box>
         );
@@ -543,9 +563,18 @@ function SkillView({
   if (skillState.kind === "failed") {
     return (
       <box flexGrow={1} alignItems="center" justifyContent="center" backgroundColor="transparent">
-        <box flexDirection="column" width={76} gap={1} border borderColor={colors.accent} padding={2}>
+        <box
+          flexDirection="column"
+          width={76}
+          gap={1}
+          border
+          borderColor={colors.accent}
+          padding={2}
+        >
           <text fg={colors.accent}>Could not load SKILL.md.</text>
-          <text fg={colors.foreground} wrapMode="word">{skillState.message}</text>
+          <text fg={colors.foreground} wrapMode="word">
+            {skillState.message}
+          </text>
           <text fg={colors.lineNumbers}>Press r to retry, Escape to return home.</text>
         </box>
       </box>
@@ -582,16 +611,18 @@ function HelpView({ colors }: { readonly colors: Theme["colors"] }) {
     <box flexGrow={1} alignItems="center" justifyContent="center" backgroundColor="transparent">
       <box flexDirection="column" width={64} gap={1} border borderColor={colors.accent} padding={2}>
         <text fg={colors.accent}>Keybinds</text>
-        <text fg={colors.foreground}>j / down       move selection down</text>
-        <text fg={colors.foreground}>k / up         move selection up</text>
-        <text fg={colors.foreground}>enter          open selected item</text>
-        <text fg={colors.foreground}>ggh gx gli...  open social links</text>
-        <text fg={colors.foreground}>gs             render latest SKILL.md</text>
-        <text fg={colors.foreground}>r              refresh SKILL.md in skill view</text>
-        <text fg={colors.foreground}>T              theme picker</text>
-        <text fg={colors.foreground}>Escape         return home</text>
-        <text fg={colors.foreground}>q / ctrl+c     quit</text>
-        <text fg={colors.lineNumbers} attributes={TextAttributes.DIM}>Press Enter or Escape to close.</text>
+        <text fg={colors.foreground}>j / down move selection down</text>
+        <text fg={colors.foreground}>k / up move selection up</text>
+        <text fg={colors.foreground}>enter open selected item</text>
+        <text fg={colors.foreground}>ggh gx gli... open social links</text>
+        <text fg={colors.foreground}>gs render latest SKILL.md</text>
+        <text fg={colors.foreground}>r refresh SKILL.md in skill view</text>
+        <text fg={colors.foreground}>T theme picker</text>
+        <text fg={colors.foreground}>Escape return home</text>
+        <text fg={colors.foreground}>q / ctrl+c quit</text>
+        <text fg={colors.lineNumbers} attributes={TextAttributes.DIM}>
+          Press Enter or Escape to close.
+        </text>
       </box>
     </box>
   );
@@ -620,11 +651,15 @@ function ThemeView({
               paddingLeft={1}
               backgroundColor={active ? colors.selection : "transparent"}
             >
-              <text fg={active ? colors.accent : colors.foreground}>{active ? "▸" : " "} {theme.name}</text>
+              <text fg={active ? colors.accent : colors.foreground}>
+                {active ? "▸" : " "} {theme.name}
+              </text>
             </box>
           );
         })}
-        <text fg={colors.lineNumbers} attributes={TextAttributes.DIM}>j/k choose · Enter or Escape closes</text>
+        <text fg={colors.lineNumbers} attributes={TextAttributes.DIM}>
+          j/k choose · Enter or Escape closes
+        </text>
       </box>
     </box>
   );
@@ -644,7 +679,13 @@ function StatusLine({
   readonly view: View;
 }) {
   const file =
-    view === "skill" ? "~/SKILL.md" : view === "help" ? "~/help" : view === "themes" ? "~/themes" : "~/main";
+    view === "skill"
+      ? "~/SKILL.md"
+      : view === "help"
+        ? "~/help"
+        : view === "themes"
+          ? "~/themes"
+          : "~/main";
   const filetype = view === "skill" ? "markdown" : view === "home" ? "main" : "text";
   const mode = view === "home" || view === "skill" ? "NORMAL" : "MENU";
 
@@ -655,13 +696,19 @@ function StatusLine({
       </box>
       <text fg={colors.statusLineText}> {file}</text>
       {statusMessage ? (
-        <text fg={statusMessage.tone === "error" ? colors.cursor : colors.accent}>  {statusMessage.text}</text>
+        <text fg={statusMessage.tone === "error" ? colors.cursor : colors.accent}>
+          {" "}
+          {statusMessage.text}
+        </text>
       ) : (
         <text fg={colors.lineNumbers} attributes={TextAttributes.DIM}></text>
       )}
       <box flexGrow={1} />
       {keyBuffer ? <text fg={colors.cursor}> keys:{keyBuffer} </text> : null}
-      <text fg={colors.statusLineText}> Theme: {currentTheme}  {filetype}  1:1 </text>
+      <text fg={colors.statusLineText}>
+        {" "}
+        Theme: {currentTheme} {filetype} 1:1{" "}
+      </text>
     </box>
   );
 }

@@ -15,16 +15,16 @@ export const LAYOUT = {
 } as const;
 
 export const DEFAULTS = {
-  MODE: 'NORMAL',
-  FILE: '~/index.html',
-  FILETYPE: 'html',
+  MODE: "NORMAL",
+  FILE: "~/index.html",
+  FILETYPE: "html",
   LINE: 1,
   COLUMN: 1,
 } as const;
 
 export const KEYBIND_PATTERNS = {
-  ARROW_KEYS: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'],
-  VIM_NAVIGATION: ['j', 'k', 'h', 'l'],
-  NAVIGATION_KEYS: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '],
-  MODAL_KEYS: ['ArrowDown', 'ArrowUp', 'j', 'k', 'Enter', 'Escape'],
+  ARROW_KEYS: ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"],
+  VIM_NAVIGATION: ["j", "k", "h", "l"],
+  NAVIGATION_KEYS: ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "],
+  MODAL_KEYS: ["ArrowDown", "ArrowUp", "j", "k", "Enter", "Escape"],
 } as const;

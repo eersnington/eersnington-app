@@ -1,5 +1,5 @@
 {
-  "name": "eersnington",
+  "name": "eersnington-monorepo",
   "private": true,
   "workspaces": {
     "packages": [

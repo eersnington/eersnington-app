@@ -2,7 +2,7 @@
  * Comprehensive TypeScript definitions for the Neovim-style portfolio
  */
 
-import type { Theme } from './themes';
+import type { Theme } from "./themes";
 
 export type Link = {
   id: string;
@@ -13,23 +13,23 @@ export type Link = {
 };
 
 export type Config = {
-	pageTitle: string;
-	// Homepage title and subtitle
-	title: string;
-	subtitle: string;
+  pageTitle: string;
+  // Homepage title and subtitle
+  title: string;
+  subtitle: string;
 
-	// Site URL for canonical links and SEO
-	siteUrl: string;
+  // Site URL for canonical links and SEO
+  siteUrl: string;
 
-	// Navigation links
-	links: Link[];
+  // Navigation links
+  links: Link[];
 
-	// Keyboard shortcuts
-	keybinds: {
-		help: string;
-		toggleTheme: string;
-		escape: string;
-	};
+  // Keyboard shortcuts
+  keybinds: {
+    help: string;
+    toggleTheme: string;
+    escape: string;
+  };
 };
 
 export type Position = {
@@ -73,7 +73,7 @@ export type LinkItemProps = {
   readonly link: Link;
   readonly index: number;
   readonly isSelected: boolean;
-  readonly theme: Theme['colors'];
+  readonly theme: Theme["colors"];
   readonly onMouseEnter: () => void;
   readonly onClick: () => void;
 };
@@ -81,7 +81,7 @@ export type LinkItemProps = {
 export type NavigationLinksProps = {
   readonly links: readonly Link[];
   readonly selectedIndex: number;
-  readonly theme: Theme['colors'];
+  readonly theme: Theme["colors"];
   readonly onLinkActivate: (link: Link) => void;
   readonly onSelectIndex?: (index: number) => void; // optional callback to sync selection from mouse hover
 };
@@ -99,8 +99,8 @@ export type BackgroundTildesProps = {
 export type ModalProps = {
   readonly isOpen: boolean;
   readonly onClose: () => void;
-  readonly theme: Theme['colors'];
-  readonly children: import('svelte').Snippet;
+  readonly theme: Theme["colors"];
+  readonly children: import("svelte").Snippet;
 };
 
 export type UseKeyboardNavigationProps = {
@@ -142,7 +142,7 @@ export type HomePageProps = {
   readonly className?: string;
 };
 
-export type IconComponent = import('svelte').Component | null;
+export type IconComponent = import("svelte").Component | null;
 
 export type KeybindPattern = readonly string[];
 
