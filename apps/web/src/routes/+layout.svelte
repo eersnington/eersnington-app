@@ -1,13 +1,22 @@
 <script lang="ts">
-	import '../app.css';
-    import Header from '../components/Header.svelte';
+	import './layout.css';
+	import icon from '$lib/assets/icon.png';
+	import config from '$lib/config';
 
-	const { children } = $props();
+	let { children } = $props();
 </script>
 
-<div class="grid h-svh grid-rows-[auto_1fr]">
-	<Header />
-	<main class="overflow-y-auto">
-		{@render children()}
-	</main>
+<svelte:head>
+	<title>{config.pageTitle}</title>
+	<link rel="icon" type="image/png" href={icon} />
+	<link rel="canonical" href={config.siteUrl} />
+	<meta name="robots" content="index, follow" />
+	<meta name="author" content={config.title} />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+	<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</svelte:head>
+
+<div class="font-mono">
+	{@render children()}
 </div>
