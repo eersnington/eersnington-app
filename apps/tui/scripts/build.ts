@@ -31,9 +31,7 @@ if (!result.success) {
 const [output] = result.outputs;
 
 if (!output) {
-  console.error(
-    "Build completed without producing an output file for src/index.tsx.",
-  );
+  console.error("Build completed without producing an output file for src/index.tsx.");
   process.exit(1);
 }
 

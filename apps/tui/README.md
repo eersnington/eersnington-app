@@ -18,9 +18,7 @@ This CLI is powered by OpenTUI and runs on Bun.
 For local development:
 
 ```sh
-# make mr sumner happy by downloading bun if you haven't
+# make mr Sumner happy by downloading bun if you haven't
 bun install
 bun run dev
 ```
-
-

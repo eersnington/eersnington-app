@@ -1,49 +1,49 @@
 {
   "name": "eersnington",
   "version": "0.3.0",
-  "description": "OpenTUI version of my site eers.dev",
   "private": false,
-  "type": "module",
-  "main": "./dist/index.js",
+  "description": "OpenTUI version of my site eers.dev",
+  "keywords": [
+    "bun",
+    "opentui",
+    "portfolio",
+    "terminal",
+    "tui"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eersnington/eersnington-app",
+    "directory": "apps/tui"
+  },
   "bin": {
     "eersnington": "./dist/index.js"
   },
-  "license": "MIT",
   "files": [
     "dist",
     "README.md"
   ],
+  "type": "module",
+  "main": "./dist/index.js",
   "scripts": {
     "dev": "bun run --watch src/index.tsx",
     "build": "bun run scripts/build.ts",
     "check-types": "tsc --noEmit",
     "prepublishOnly": "bun run check-types && bun run build"
   },
-  "keywords": [
-    "portfolio",
-    "tui",
-    "terminal",
-    "opentui",
-    "bun"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/eersnington/eersnington-app",
-    "directory": "apps/tui"
-  },
   "dependencies": {},
-  "optionalDependencies": {
-    "@opentui/core-darwin-x64": "0.4.2",
-    "@opentui/core-darwin-arm64": "0.4.2",
-    "@opentui/core-linux-x64": "0.4.2",
-    "@opentui/core-linux-arm64": "0.4.2",
-    "@opentui/core-win32-x64": "0.4.2",
-    "@opentui/core-win32-arm64": "0.4.2"
-  },
   "devDependencies": {
     "@opentui/core": "0.4.2",
     "@opentui/solid": "0.4.2",
     "@types/bun": "latest",
     "solid-js": "1.9.12"
+  },
+  "optionalDependencies": {
+    "@opentui/core-darwin-arm64": "0.4.2",
+    "@opentui/core-darwin-x64": "0.4.2",
+    "@opentui/core-linux-arm64": "0.4.2",
+    "@opentui/core-linux-x64": "0.4.2",
+    "@opentui/core-win32-arm64": "0.4.2",
+    "@opentui/core-win32-x64": "0.4.2"
   }
 }

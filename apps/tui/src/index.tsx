@@ -1,10 +1,5 @@
 import { SyntaxStyle, TextAttributes } from "@opentui/core";
-import {
-  render,
-  useKeyboard,
-  useRenderer,
-  useTerminalDimensions,
-} from "@opentui/solid";
+import { render, useKeyboard, useRenderer, useTerminalDimensions } from "@opentui/solid";
 import {
   createEffect,
   createMemo,
@@ -212,20 +207,12 @@ function isUpKey(event: KeyEventLike): boolean {
 }
 
 function isEnterKey(event: KeyEventLike): boolean {
-  return (
-    event.name === "return" ||
-    event.name === "linefeed" ||
-    event.name === "enter"
-  );
+  return event.name === "return" || event.name === "linefeed" || event.name === "enter";
 }
 
 function openExternalUrl(url: string): void {
   const opener =
-    process.platform === "darwin"
-      ? "open"
-      : process.platform === "win32"
-        ? "cmd"
-        : "xdg-open";
+    process.platform === "darwin" ? "open" : process.platform === "win32" ? "cmd" : "xdg-open";
   const args = process.platform === "win32" ? ["/c", "start", "", url] : [url];
 
   Bun.spawn([opener, ...args], {
@@ -243,11 +230,7 @@ function getClipboardCommands(): readonly (readonly string[])[] {
     return [["cmd", "/c", "clip"]];
   }
 
-  return [
-    ["wl-copy"],
-    ["xclip", "-selection", "clipboard"],
-    ["xsel", "--clipboard", "--input"],
-  ];
+  return [["wl-copy"], ["xclip", "-selection", "clipboard"], ["xsel", "--clipboard", "--input"]];
 }
 
 async function writeClipboardText(text: string): Promise<boolean> {
@@ -319,9 +302,7 @@ function App() {
   const [selectedIndex, setSelectedIndex] = createSignal(0);
   const [themeIndex, setThemeIndex] = createSignal(0);
   const [keyBuffer, setKeyBuffer] = createSignal("");
-  const [statusMessage, setStatusMessage] = createSignal<StatusMessage | null>(
-    null,
-  );
+  const [statusMessage, setStatusMessage] = createSignal<StatusMessage | null>(null);
   const [skillState, setSkillState] = createSignal<SkillState>({
     kind: "idle",
   });
@@ -382,10 +363,7 @@ function App() {
 
     const currentSkillState = skillState();
 
-    if (
-      currentSkillState.kind === "idle" ||
-      currentSkillState.kind === "failed"
-    ) {
+    if (currentSkillState.kind === "idle" || currentSkillState.kind === "failed") {
       loadSkill();
     }
   }
@@ -532,20 +510,9 @@ function App() {
   });
 
   return (
-    <box
-      flexDirection="column"
-      flexGrow={1}
-      backgroundColor={colors().background}
-    >
-      <box
-        flexGrow={1}
-        flexDirection="row"
-        backgroundColor={colors().background}
-      >
-        <LineGutter
-          height={Math.max(0, dimensions().height - 1)}
-          color={colors().lineNumbers}
-        />
+    <box flexDirection="column" flexGrow={1} backgroundColor={colors().background}>
+      <box flexGrow={1} flexDirection="row" backgroundColor={colors().background}>
+        <LineGutter height={Math.max(0, dimensions().height - 1)} color={colors().lineNumbers} />
         <box
           flexGrow={1}
           paddingLeft={2}
@@ -554,28 +521,16 @@ function App() {
           backgroundColor={colors().background}
         >
           <Show when={view() === "home"}>
-            <HomeView
-              colors={colors()}
-              links={LINKS}
-              selectedIndex={selectedIndex()}
-            />
+            <HomeView colors={colors()} links={LINKS} selectedIndex={selectedIndex()} />
           </Show>
           <Show when={view() === "skill"}>
-            <SkillView
-              colors={colors()}
-              skillState={skillState()}
-              syntaxStyle={syntaxStyle()}
-            />
+            <SkillView colors={colors()} skillState={skillState()} syntaxStyle={syntaxStyle()} />
           </Show>
           <Show when={view() === "help"}>
             <HelpView colors={colors()} />
           </Show>
           <Show when={view() === "themes"}>
-            <ThemeView
-              colors={colors()}
-              selectedThemeIndex={themeIndex()}
-              themes={THEMES}
-            />
+            <ThemeView colors={colors()} selectedThemeIndex={themeIndex()} themes={THEMES} />
           </Show>
           <Show when={view() === "contact"}>
             <ContactView colors={colors()} />
@@ -593,21 +548,13 @@ function App() {
   );
 }
 
-function LineGutter(props: {
-  readonly height: number;
-  readonly color: string;
-}) {
+function LineGutter(props: { readonly height: number; readonly color: string }) {
   const rows = createMemo(() =>
     Array.from({ length: Math.max(1, props.height) }, (_, index) => index + 1),
   );
 
   return (
-    <box
-      flexDirection="column"
-      width={6}
-      paddingRight={1}
-      backgroundColor="transparent"
-    >
+    <box flexDirection="column" width={6} paddingRight={1} backgroundColor="transparent">
       <For each={rows()}>
         {(line) => (
           <text fg={props.color} attributes={TextAttributes.DIM} truncate>
@@ -625,12 +572,7 @@ function HomeView(props: {
   readonly selectedIndex: number;
 }) {
   return (
-    <box
-      flexGrow={1}
-      justifyContent="center"
-      alignItems="center"
-      backgroundColor="transparent"
-    >
+    <box flexGrow={1} justifyContent="center" alignItems="center" backgroundColor="transparent">
       <box
         flexDirection="column"
         alignItems="center"
@@ -638,11 +580,7 @@ function HomeView(props: {
         width={58}
         backgroundColor="transparent"
       >
-        <box
-          flexDirection="column"
-          alignItems="center"
-          backgroundColor="transparent"
-        >
+        <box flexDirection="column" alignItems="center" backgroundColor="transparent">
           <For each={SHORT_ASCII_TITLE.split("\n")}>
             {(line) => (
               <text fg={props.colors.accent} wrapMode="none">
@@ -679,12 +617,7 @@ function NavigationLinks(props: {
   readonly selectedIndex: number;
 }) {
   return (
-    <box
-      flexDirection="column"
-      width={42}
-      gap={1}
-      backgroundColor="transparent"
-    >
+    <box flexDirection="column" width={42} gap={1} backgroundColor="transparent">
       <For each={props.links}>
         {(link, index) => {
           const active = () => index() === props.selectedIndex;
@@ -696,18 +629,12 @@ function NavigationLinks(props: {
               justifyContent="space-between"
               paddingLeft={1}
               paddingRight={1}
-              backgroundColor={
-                active() ? props.colors.selection : "transparent"
-              }
+              backgroundColor={active() ? props.colors.selection : "transparent"}
             >
-              <text
-                fg={active() ? props.colors.accent : props.colors.foreground}
-              >
+              <text fg={active() ? props.colors.accent : props.colors.foreground}>
                 {prefix()} {link.title}
               </text>
-              <text
-                fg={active() ? props.colors.accent : props.colors.lineNumbers}
-              >
+              <text fg={active() ? props.colors.accent : props.colors.lineNumbers}>
                 {link.keybind}
               </text>
             </box>
@@ -725,26 +652,12 @@ function SkillView(props: {
 }) {
   return (
     <Switch>
-      <Match
-        when={
-          props.skillState.kind === "loading" ||
-          props.skillState.kind === "idle"
-        }
-      >
-        <box
-          flexGrow={1}
-          alignItems="center"
-          justifyContent="center"
-          backgroundColor="transparent"
-        >
-          <text fg={props.colors.accent}>
-            Fetching latest SKILL.md from GitHub Gist...
-          </text>
+      <Match when={props.skillState.kind === "loading" || props.skillState.kind === "idle"}>
+        <box flexGrow={1} alignItems="center" justifyContent="center" backgroundColor="transparent">
+          <text fg={props.colors.accent}>Fetching latest SKILL.md from GitHub Gist...</text>
         </box>
       </Match>
-      <Match
-        when={props.skillState.kind === "failed" ? props.skillState : null}
-      >
+      <Match when={props.skillState.kind === "failed" ? props.skillState : null}>
         {(failedState) => (
           <box
             flexGrow={1}
@@ -764,16 +677,12 @@ function SkillView(props: {
               <text fg={props.colors.foreground} wrapMode="word">
                 {failedState().message}
               </text>
-              <text fg={props.colors.lineNumbers}>
-                Press r to retry, Escape to return home.
-              </text>
+              <text fg={props.colors.lineNumbers}>Press r to retry, Escape to return home.</text>
             </box>
           </box>
         )}
       </Match>
-      <Match
-        when={props.skillState.kind === "loaded" ? props.skillState : null}
-      >
+      <Match when={props.skillState.kind === "loaded" ? props.skillState : null}>
         {(loadedState) => (
           <scrollbox
             focused
@@ -805,12 +714,7 @@ function SkillView(props: {
 
 function HelpView(props: { readonly colors: Theme["colors"] }) {
   return (
-    <box
-      flexGrow={1}
-      alignItems="center"
-      justifyContent="center"
-      backgroundColor="transparent"
-    >
+    <box flexGrow={1} alignItems="center" justifyContent="center" backgroundColor="transparent">
       <box
         flexDirection="column"
         width={64}
@@ -823,14 +727,10 @@ function HelpView(props: { readonly colors: Theme["colors"] }) {
         <text fg={props.colors.foreground}>j / down move selection down</text>
         <text fg={props.colors.foreground}>k / up move selection up</text>
         <text fg={props.colors.foreground}>enter open selected item</text>
-        <text fg={props.colors.foreground}>
-          ggh gx gli... open social links
-        </text>
+        <text fg={props.colors.foreground}>ggh gx gli... open social links</text>
         <text fg={props.colors.foreground}>gcm show contact card</text>
         <text fg={props.colors.foreground}>gs render latest SKILL.md</text>
-        <text fg={props.colors.foreground}>
-          r refresh SKILL.md in skill view
-        </text>
+        <text fg={props.colors.foreground}>r refresh SKILL.md in skill view</text>
         <text fg={props.colors.foreground}>T theme picker</text>
         <text fg={props.colors.foreground}>Escape return home</text>
         <text fg={props.colors.foreground}>q / ctrl+c quit</text>
@@ -844,12 +744,7 @@ function HelpView(props: { readonly colors: Theme["colors"] }) {
 
 function ContactView(props: { readonly colors: Theme["colors"] }) {
   return (
-    <box
-      flexGrow={1}
-      alignItems="center"
-      justifyContent="center"
-      backgroundColor="transparent"
-    >
+    <box flexGrow={1} alignItems="center" justifyContent="center" backgroundColor="transparent">
       <box
         flexDirection="column"
         alignItems="center"
@@ -885,12 +780,7 @@ function ThemeView(props: {
   readonly themes: readonly Theme[];
 }) {
   return (
-    <box
-      flexGrow={1}
-      alignItems="center"
-      justifyContent="center"
-      backgroundColor="transparent"
-    >
+    <box flexGrow={1} alignItems="center" justifyContent="center" backgroundColor="transparent">
       <box
         flexDirection="column"
         width={42}
@@ -908,13 +798,9 @@ function ThemeView(props: {
               <box
                 flexDirection="row"
                 paddingLeft={1}
-                backgroundColor={
-                  active() ? props.colors.selection : "transparent"
-                }
+                backgroundColor={active() ? props.colors.selection : "transparent"}
               >
-                <text
-                  fg={active() ? props.colors.accent : props.colors.foreground}
-                >
+                <text fg={active() ? props.colors.accent : props.colors.foreground}>
                   {active() ? "▸" : " "} {theme.name}
                 </text>
               </box>
@@ -947,47 +833,22 @@ function StatusLine(props: {
             ? "~/contact"
             : "~/main";
   const filetype = () =>
-    props.view === "skill"
-      ? "markdown"
-      : props.view === "home"
-        ? "main"
-        : "text";
+    props.view === "skill" ? "markdown" : props.view === "home" ? "main" : "text";
   const mode = () =>
-    props.view === "home" || props.view === "skill" || props.view === "contact"
-      ? "NORMAL"
-      : "MENU";
+    props.view === "home" || props.view === "skill" || props.view === "contact" ? "NORMAL" : "MENU";
 
   return (
-    <box
-      height={1}
-      flexDirection="row"
-      backgroundColor={props.colors.statusLine}
-    >
-      <box
-        paddingLeft={1}
-        paddingRight={1}
-        backgroundColor={props.colors.normalMode}
-      >
+    <box height={1} flexDirection="row" backgroundColor={props.colors.statusLine}>
+      <box paddingLeft={1} paddingRight={1} backgroundColor={props.colors.normalMode}>
         <text fg={props.colors.normalModeText}>{mode()}</text>
       </box>
       <text fg={props.colors.statusLineText}> {file()}</text>
       <Show
         when={props.statusMessage}
-        fallback={
-          <text
-            fg={props.colors.lineNumbers}
-            attributes={TextAttributes.DIM}
-          ></text>
-        }
+        fallback={<text fg={props.colors.lineNumbers} attributes={TextAttributes.DIM}></text>}
       >
         {(message) => (
-          <text
-            fg={
-              message().tone === "error"
-                ? props.colors.cursor
-                : props.colors.accent
-            }
-          >
+          <text fg={message().tone === "error" ? props.colors.cursor : props.colors.accent}>
             {" "}
             {message().text}
           </text>
