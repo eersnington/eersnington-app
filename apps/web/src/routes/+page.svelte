@@ -10,7 +10,7 @@ import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
 import VimStatusDisplay from '$lib/components/VimStatusDisplay.svelte';
 import config from '$lib/config';
 import { DEFAULTS, KEYBOARD, LAYOUT } from '$lib/constants';
-import { defaultTheme, themes } from '$lib/themes';
+import { themes, vesperTheme } from '$lib/themes';
 import type { Link } from '$lib/types';
 import {
   isDownKey,
@@ -27,7 +27,7 @@ import {
 const DEFAULT_WINDOW_HEIGHT = 800;
 
 let currentThemeIndex = $state(0);
-const currentTheme = $derived(themes[currentThemeIndex] ?? defaultTheme);
+const currentTheme = $derived(themes[currentThemeIndex] ?? vesperTheme);
 
 let showHelp = $state(false);
 let showThemeSwitcher = $state(false);

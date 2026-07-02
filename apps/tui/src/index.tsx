@@ -52,6 +52,15 @@ const SKILL_RAW_URL =
 
 const SUBTITLE = "software engineer | web, typescript, zig, f1";
 
+const SHORT_ASCII_TITLE = `
+███████╗██████╗ ███████╗███████╗    ███╗   ██╗
+██╔════╝██╔══██╗██╔════╝██╔════╝    ████╗  ██║
+███████╗██████╔╝█████╗  █████╗      ██╔██╗ ██║
+╚════██║██╔══██╗██╔══╝  ██╔══╝      ██║╚██╗██║
+███████║██║  ██║███████╗███████╗    ██║ ╚████║
+╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝    ╚═╝  ╚═══╝
+`.trim();
+
 const LINKS: readonly Link[] = [
   {
     id: "github",
@@ -99,67 +108,67 @@ const LINKS: readonly Link[] = [
 
 const THEMES: readonly Theme[] = [
   {
-    name: "Default",
+    name: "Vesper",
     colors: {
-      background: "#1E1E2E",
-      foreground: "#CDD6F4",
-      cursor: "#F5E0DC",
-      selection: "#313346",
-      statusLine: "#181825",
-      statusLineText: "#CDD6F4",
-      normalMode: "#89B4FA",
-      normalModeText: "#181825",
-      lineNumbers: "#6C7086",
-      accent: "#89B4FA",
-      hover: "#313346",
+      background: "#101010",
+      foreground: "#FFFFFF",
+      cursor: "#FFC799",
+      selection: "#1C1C1C",
+      statusLine: "#171717",
+      statusLineText: "#99FFE4",
+      normalMode: "#FFC799",
+      normalModeText: "#101010",
+      lineNumbers: "#5F5F5F",
+      accent: "#FFC799",
+      hover: "#1C1C1C",
+    },
+  },
+  {
+    name: "Tokyo Night",
+    colors: {
+      background: "#1a1b26",
+      foreground: "#c0caf5",
+      cursor: "#c0caf5",
+      selection: "#283457",
+      statusLine: "#16161e",
+      statusLineText: "#7aa2f7",
+      normalMode: "#7aa2f7",
+      normalModeText: "#16161e",
+      lineNumbers: "#565f89",
+      accent: "#7aa2f7",
+      hover: "#292e42",
     },
   },
   {
     name: "Catppuccin",
     colors: {
-      background: "#1E1E2E",
-      foreground: "#CDD6F4",
-      cursor: "#F5E0DC",
-      selection: "#45475A",
+      background: "#1e1e2e",
+      foreground: "#cdd6f4",
+      cursor: "#f5e0dc",
+      selection: "#45475a",
       statusLine: "#181825",
-      statusLineText: "#CDD6F4",
-      normalMode: "#F5C2E7",
+      statusLineText: "#cdd6f4",
+      normalMode: "#f5c2e7",
       normalModeText: "#181825",
-      lineNumbers: "#6C7086",
-      accent: "#F5C2E7",
+      lineNumbers: "#6c7086",
+      accent: "#f5c2e7",
       hover: "#313244",
     },
   },
   {
-    name: "Claude",
+    name: "Mono",
     colors: {
-      background: "#1C1C1C",
-      foreground: "#E6E6E6",
-      cursor: "#E86C52",
-      selection: "#2D2D2D",
-      statusLine: "#141414",
-      statusLineText: "#7EB6FF",
-      normalMode: "#E86C52",
-      normalModeText: "#141414",
+      background: "#000000",
+      foreground: "#ededed",
+      cursor: "#ffffff",
+      selection: "#1a1a1a",
+      statusLine: "#111111",
+      statusLineText: "#a1a1a1",
+      normalMode: "#ffffff",
+      normalModeText: "#000000",
       lineNumbers: "#666666",
-      accent: "#E86C52",
-      hover: "#2D2D2D",
-    },
-  },
-  {
-    name: "Light",
-    colors: {
-      background: "#F8F8F2",
-      foreground: "#282A36",
-      cursor: "#FF79C6",
-      selection: "#E6E6E6",
-      statusLine: "#F1F1F1",
-      statusLineText: "#44475A",
-      normalMode: "#50FA7B",
-      normalModeText: "#282A36",
-      lineNumbers: "#6272A4",
-      accent: "#BD93F9",
-      hover: "#F1F1F1",
+      accent: "#ffffff",
+      hover: "#1f1f1f",
     },
   },
 ];
@@ -462,7 +471,13 @@ function HomeView({
   return (
     <box flexGrow={1} justifyContent="center" alignItems="center" backgroundColor="transparent">
       <box flexDirection="column" alignItems="center" gap={1} width={58} backgroundColor="transparent">
-        <ascii-font font="tiny" text="Sree" color={colors.accent} />
+        <box flexDirection="column" alignItems="center" backgroundColor="transparent">
+          {SHORT_ASCII_TITLE.split("\n").map((line) => (
+            <text key={line} fg={colors.accent} wrapMode="none">
+              {line}
+            </text>
+          ))}
+        </box>
         <box paddingLeft={2} paddingRight={2} paddingTop={1} paddingBottom={1} backgroundColor={colors.selection}>
           <text fg={colors.foreground}>{SUBTITLE} ▲</text>
         </box>
@@ -629,8 +644,8 @@ function StatusLine({
   readonly view: View;
 }) {
   const file =
-    view === "skill" ? "~/SKILL.md" : view === "help" ? "~/help.txt" : view === "themes" ? "~/themes.txt" : "~/index.html";
-  const filetype = view === "skill" ? "markdown" : view === "home" ? "html" : "text";
+    view === "skill" ? "~/SKILL.md" : view === "help" ? "~/help" : view === "themes" ? "~/themes" : "~/main";
+  const filetype = view === "skill" ? "markdown" : view === "home" ? "main" : "text";
   const mode = view === "home" || view === "skill" ? "NORMAL" : "MENU";
 
   return (
@@ -642,7 +657,7 @@ function StatusLine({
       {statusMessage ? (
         <text fg={statusMessage.tone === "error" ? colors.cursor : colors.accent}>  {statusMessage.text}</text>
       ) : (
-        <text fg={colors.lineNumbers} attributes={TextAttributes.DIM}>  ? help · T theme · gs skill</text>
+        <text fg={colors.lineNumbers} attributes={TextAttributes.DIM}></text>
       )}
       <box flexGrow={1} />
       {keyBuffer ? <text fg={colors.cursor}> keys:{keyBuffer} </text> : null}
