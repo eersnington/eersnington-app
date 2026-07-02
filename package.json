@@ -9,7 +9,7 @@
     "catalog": {
       "dotenv": "^17.2.2",
       "zod": "^4.1.13",
-      "typescript": "^6"
+      "typescript": "6.0.3"
     }
   },
   "type": "module",
@@ -22,7 +22,6 @@
     "check": "oxlint && oxfmt --write"
   },
   "dependencies": {
-    "@eersnington/env": "workspace:*",
     "dotenv": "catalog:",
     "zod": "catalog:"
   },
@@ -34,5 +33,19 @@
     "turbo": "^2.9.16",
     "typescript": "catalog:"
   },
-  "packageManager": "bun@1.3.14"
+  "packageManager": "bun@1.3.14",
+  "version": "1.0.0",
+  "description": "This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines SvelteKit, and more.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eersnington/eersnington-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eersnington/eersnington-app/issues"
+  },
+  "homepage": "https://github.com/eersnington/eersnington-app#readme"
 }

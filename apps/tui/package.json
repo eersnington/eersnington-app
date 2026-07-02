@@ -1,22 +1,42 @@
 {
   "name": "eersnington",
+  "version": "0.1.0",
+  "description": "OpenTUI version of my site eers.dev",
   "private": false,
   "type": "module",
-  "module": "src/index.tsx",
+  "main": "./dist/index.js",
+  "bin": {
+    "eersnington": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "dev": "bun run --watch src/index.tsx",
-    "check-types": "tsc --noEmit"
+    "build": "bun run scripts/build.ts",
+    "check-types": "tsc --noEmit",
+    "prepublishOnly": "bun run check-types && bun run build"
+  },
+  "keywords": [
+    "portfolio",
+    "tui",
+    "terminal",
+    "opentui",
+    "bun"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eersnington/eersnington.git",
+    "directory": "apps/tui"
   },
   "dependencies": {
-    "@opentui/core": "^0.4.2",
-    "@opentui/react": "^0.4.2",
-    "react": "^19.2.6"
+    "@opentui/core": "0.4.2",
+    "@opentui/react": "0.4.2",
+    "react": "19.2.6"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/react": "^19.2.7"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
   }
 }
