@@ -1,6 +1,6 @@
 {
   "name": "eersnington",
-  "private": true,
+  "private": false,
   "type": "module",
   "module": "src/index.tsx",
   "scripts": {
