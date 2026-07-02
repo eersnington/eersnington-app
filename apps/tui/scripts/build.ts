@@ -1,9 +1,11 @@
 import { chmod } from "node:fs/promises";
+import solidPlugin from "@opentui/solid/bun-plugin";
 
 const result = await Bun.build({
   entrypoints: ["src/index.tsx"],
   target: "bun",
   packages: "external",
+  plugins: [solidPlugin],
   banner: "#!/usr/bin/env bun",
 });
 

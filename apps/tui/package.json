@@ -32,11 +32,10 @@
   },
   "dependencies": {
     "@opentui/core": "0.4.2",
-    "@opentui/react": "0.4.2",
-    "react": "19.2.6"
+    "@opentui/solid": "0.4.2",
+    "solid-js": "1.9.12"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "@types/react": "^19.2.7"
+    "@types/bun": "latest"
   }
 }
