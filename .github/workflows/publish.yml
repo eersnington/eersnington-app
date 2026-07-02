@@ -7,7 +7,7 @@ on:
         description: Exact version to publish for both packages, e.g. 0.1.1
         required: true
       confirm:
-        description: Type publish eersnington+sreenarayanan@<version>
+        description: Type publish both packages @<version>
         required: true
       npm_tag:
         description: npm dist-tag
@@ -23,9 +23,12 @@ permissions:
   contents: read
 
 jobs:
-  verify:
+  publish:
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # required for npm Trusted Publishing (OIDC)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,7 +50,7 @@ jobs:
           INPUT_CONFIRM: ${{ inputs.confirm }}
           INPUT_VERSION: ${{ inputs.version }}
         run: |
-          expected_confirm="publish eersnington+sreenarayanan@${INPUT_VERSION}"
+          expected_confirm="publish both packages @${INPUT_VERSION}"
 
           if ! printf '%s' "${INPUT_VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'; then
             printf 'Refusing to publish: workflow input version "%s" is not a valid semver version. No package was published.\n' "${INPUT_VERSION}" >&2
@@ -77,114 +80,18 @@ jobs:
         working-directory: apps/tui
         run: bun run build
 
-      - name: Pack npm packages
-        env:
-          INPUT_VERSION: ${{ inputs.version }}
-        working-directory: apps/tui
-        run: |
-          rm -rf ../../release-work ../../release-artifacts
-          mkdir -p ../../release-work ../../release-artifacts
-
-          for package_name in sreenarayanan eersnington; do
-            package_dir="../../release-work/${package_name}"
-            mkdir -p "${package_dir}/dist"
-
-            cp package.json "${package_dir}/package.json"
-            cp README.md "${package_dir}/README.md"
-            cp dist/index.js "${package_dir}/dist/index.js"
-
-            npm pkg set "name=${package_name}" --prefix "${package_dir}"
-            npm pkg set "version=${INPUT_VERSION}" --prefix "${package_dir}"
-            npm pkg delete bin --prefix "${package_dir}"
-            npm pkg set "bin.${package_name}=./dist/index.js" --prefix "${package_dir}"
-            npm pack "${package_dir}" --pack-destination ../../release-artifacts
-          done
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: npm-packages
-          path: release-artifacts/*.tgz
-          if-no-files-found: error
-          retention-days: 1
-
-  publish:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: verify
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # required for npm Trusted Publishing (OIDC)
-    steps:
-      # npm Trusted Publishing requires npm >= 11.5.1 and Node >= 22.14.
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          registry-url: "https://registry.npmjs.org"
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: npm-packages
-          path: release-artifacts
-
-      - name: Resolve downloaded tarballs
-        env:
-          INPUT_VERSION: ${{ inputs.version }}
-        run: |
-          node --input-type=module <<'NODE'
-          import { appendFileSync, readdirSync, statSync } from "node:fs";
-          import { join } from "node:path";
-
-          const artifactDir = "release-artifacts";
-          const version = process.env.INPUT_VERSION;
-          const githubEnv = process.env.GITHUB_ENV;
-
-          if (!version) {
-            console.error("INPUT_VERSION is missing. Cannot resolve npm package tarballs.");
-            process.exit(1);
-          }
-
-          if (!githubEnv) {
-            console.error("GITHUB_ENV is missing. Cannot pass tarball paths to the publish step.");
-            process.exit(1);
-          }
-
-          function listFiles(directory) {
-            return readdirSync(directory).flatMap((entry) => {
-              const path = join(directory, entry);
-              return statSync(path).isDirectory() ? listFiles(path) : [path];
-            });
-          }
-
-          const tarballs = listFiles(artifactDir).filter((path) => path.endsWith(".tgz")).sort();
-
-          console.log("Downloaded npm package tarballs:");
-          for (const tarball of tarballs) {
-            console.log(`- ${tarball}`);
-          }
-
-          const targets = [
-            ["sreenarayanan", "SREENARAYANAN_TARBALL"],
-            ["eersnington", "EERSNINGTON_TARBALL"],
-          ];
-
-          for (const [packageName, envName] of targets) {
-            const expectedFileName = `${packageName}-${version}.tgz`;
-            const matches = tarballs.filter((path) => path.endsWith(expectedFileName));
-
-            if (matches.length !== 1) {
-              console.error(
-                `Expected exactly one downloaded tarball named ${expectedFileName}, found ${matches.length}. No package was published.`,
-              );
-              process.exit(1);
-            }
-
-            appendFileSync(githubEnv, `${envName}=${matches[0]}\n`);
-          }
-          NODE
-
       - name: Publish npm packages (OIDC, no token)
         env:
+          INPUT_VERSION: ${{ inputs.version }}
           NPM_TAG: ${{ inputs.npm_tag }}
+        working-directory: apps/tui
         run: |
-          npm publish "${SREENARAYANAN_TARBALL}" --provenance --tag "${NPM_TAG}" --ignore-scripts
-          npm publish "${EERSNINGTON_TARBALL}" --provenance --tag "${NPM_TAG}" --ignore-scripts
+          for package_name in sreenarayanan eersnington; do
+            npm pkg set "name=${package_name}"
+            npm pkg set "version=${INPUT_VERSION}"
+            npm pkg delete bin
+            npm pkg set "bin.${package_name}=./dist/index.js"
+
+            printf 'Publishing %s@%s from apps/tui\n' "${package_name}" "${INPUT_VERSION}"
+            npm publish --provenance --tag "${NPM_TAG}" --ignore-scripts
+          done
