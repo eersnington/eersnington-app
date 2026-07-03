@@ -4,4 +4,10 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
+  server: {
+    host: true,
+    allowedHosts: [
+      'ttdo5kud-turbotunnel.vercel.app',
+    ]
+  }
 });
