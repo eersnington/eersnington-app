@@ -6,9 +6,6 @@ export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
   server: {
     host: true,
-    allowedHosts: [
-      '.vercel.app',
-      '.ngrok-free.app'
-    ]
-  }
+    allowedHosts: [".vercel.app", ".ngrok-free.app"],
+  },
 });
