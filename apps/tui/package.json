@@ -1,6 +1,6 @@
 {
   "name": "eersnington",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": false,
   "description": "TUI version of my site eers.dev in Rust",
   "keywords": [
