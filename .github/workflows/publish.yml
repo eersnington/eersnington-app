@@ -23,23 +23,15 @@ permissions:
   contents: read
 
 jobs:
-  publish:
+  validate:
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # required for npm Trusted Publishing (OIDC)
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
           persist-credentials: false
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      # npm Trusted Publishing requires npm >= 11.5.1 and Node >= 22.14.
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
@@ -69,16 +61,119 @@ jobs:
             fi
           done
 
+  build-native:
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux-x64
+            extension: ""
+          - runner: ubuntu-24.04-arm
+            platform: linux-arm64
+            extension: ""
+          - runner: macos-13
+            platform: darwin-x64
+            extension: ""
+          - runner: macos-latest
+            platform: darwin-arm64
+            extension: ""
+          - runner: windows-latest
+            platform: win32-x64
+            extension: ".exe"
+          - runner: windows-11-arm
+            platform: win32-arm64
+            extension: ".exe"
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Build native binary
+        run: cargo build --release --manifest-path apps/tui/Cargo.toml
+
+      - name: Stage native binary
+        shell: bash
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          EXTENSION: ${{ matrix.extension }}
+        run: |
+          mkdir -p "native/${PLATFORM}"
+          cp "apps/tui/target/release/eersnington-tui${EXTENSION}" "native/${PLATFORM}/eersnington${EXTENSION}"
+          if [ "${EXTENSION}" = "" ]; then
+            chmod 755 "native/${PLATFORM}/eersnington"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.platform }}
+          path: native
+          if-no-files-found: error
+
+  publish:
+    needs: [validate, build-native]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # required for npm Trusted Publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      - uses: dtolnay/rust-toolchain@stable
+
       - name: Install deps
         run: bun install --frozen-lockfile
 
-      - name: Check TUI
-        working-directory: apps/tui
-        run: bun run check-types
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: native-*
+          path: apps/tui/dist/bin
+          merge-multiple: true
 
-      - name: Build TUI
+      - name: Restore native binary executable bits
+        run: |
+          chmod 755 apps/tui/dist/bin/darwin-arm64/eersnington
+          chmod 755 apps/tui/dist/bin/darwin-x64/eersnington
+          chmod 755 apps/tui/dist/bin/linux-arm64/eersnington
+          chmod 755 apps/tui/dist/bin/linux-x64/eersnington
+
+      - name: Assemble npm package
         working-directory: apps/tui
-        run: bun run build
+        run: bun run assemble
+
+      - name: Check Rust formatting
+        run: cargo fmt --manifest-path apps/tui/Cargo.toml --check
+
+      - name: Test Rust TUI
+        run: cargo test --manifest-path apps/tui/Cargo.toml
+
+      - name: Lint Rust TUI
+        run: cargo clippy --manifest-path apps/tui/Cargo.toml --all-targets --all-features -- -D warnings
+
+      - name: Check npm package
+        working-directory: apps/tui
+        run: REQUIRE_ALL_NATIVE_BINARIES=1 bun run check-types
+
+      - name: Preview npm package
+        working-directory: apps/tui
+        run: npm pack --dry-run
 
       - name: Publish npm packages (OIDC, no token)
         env:
@@ -89,7 +184,8 @@ jobs:
           for package_name in sreenarayanan eersnington; do
             npm pkg set "name=${package_name}"
             npm pkg set "version=${INPUT_VERSION}"
-            npm pkg set "bin=./dist/index.js"
+            npm pkg set 'bin.eersnington=./dist/cli.js'
+            npm pkg set 'bin.sreenarayanan=./dist/cli.js'
 
             printf 'Publishing %s@%s from apps/tui\n' "${package_name}" "${INPUT_VERSION}"
             npm publish --provenance --tag "${NPM_TAG}" --ignore-scripts
