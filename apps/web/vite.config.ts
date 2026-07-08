@@ -7,7 +7,8 @@ export default defineConfig({
   server: {
     host: true,
     allowedHosts: [
-      'ttdo5kud-turbotunnel.vercel.app',
+      '.vercel.app',
+      '.ngrok-free.app'
     ]
   }
 });
