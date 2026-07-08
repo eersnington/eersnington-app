@@ -29,7 +29,7 @@ export async function writeNativePackage(options: NativePackageOptions): Promise
     license: "MIT",
     repository: {
       type: "git",
-      url: "https://github.com/eersnington/eersnington-app",
+      url: "git+https://github.com/eersnington/eersnington-app.git",
       directory: "apps/tui",
     },
     publishConfig: {

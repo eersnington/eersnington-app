@@ -12,3 +12,9 @@ open = "5"
 ratatui = "0.29"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls"] }
 thiserror = "2"
+
+[profile.release]
+codegen-units = 1
+lto = true
+panic = "abort"
+strip = true
