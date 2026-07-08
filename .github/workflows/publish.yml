@@ -67,24 +67,30 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - runner: macos-15
+            platform: darwin-arm64
+            rust_target: aarch64-apple-darwin
+            deployment_target: "13.0"
+          - runner: macos-15-intel
+            platform: darwin-x64
+            rust_target: x86_64-apple-darwin
+            deployment_target: "13.0"
+          - runner: ubuntu-latest
+            platform: linux-arm64
+            rust_target: aarch64-unknown-linux-gnu
+            deployment_target: ""
           - runner: ubuntu-latest
             platform: linux-x64
-            extension: ""
-          - runner: ubuntu-24.04-arm
-            platform: linux-arm64
-            extension: ""
-          - runner: macos-13
-            platform: darwin-x64
-            extension: ""
-          - runner: macos-latest
-            platform: darwin-arm64
-            extension: ""
-          - runner: windows-latest
-            platform: win32-x64
-            extension: ".exe"
-          - runner: windows-11-arm
-            platform: win32-arm64
-            extension: ".exe"
+            rust_target: x86_64-unknown-linux-gnu
+            deployment_target: ""
+          - runner: ubuntu-latest
+            platform: linux-arm64-musl
+            rust_target: aarch64-unknown-linux-musl
+            deployment_target: ""
+          - runner: ubuntu-latest
+            platform: linux-x64-musl
+            rust_target: x86_64-unknown-linux-musl
+            deployment_target: ""
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -94,20 +100,46 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
+      - name: Install cross
+        if: runner.os == 'Linux'
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cross
+
+      - name: Add Rust target
+        if: runner.os != 'Linux'
+        run: rustup target add "${{ matrix.rust_target }}"
+
       - name: Build native binary
-        run: cargo build --release --manifest-path apps/tui/Cargo.toml
+        env:
+          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.deployment_target }}
+        run: |
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            cross build --locked --release --target "${{ matrix.rust_target }}" --manifest-path apps/tui/Cargo.toml
+          else
+            cargo build --locked --release --target "${{ matrix.rust_target }}" --manifest-path apps/tui/Cargo.toml
+          fi
+
+      - name: Verify macOS deployment target
+        if: runner.os == 'macOS'
+        run: |
+          MIN_OS=$(otool -l "apps/tui/target/${{ matrix.rust_target }}/release/eersnington-tui" | awk '
+            $1 == "cmd" && $2 == "LC_BUILD_VERSION" { in_build = 1; next }
+            in_build && $1 == "minos" { print $2; exit }
+          ')
+          if [ "$MIN_OS" != "${{ matrix.deployment_target }}" ]; then
+            echo "::error::Expected macOS deployment target ${{ matrix.deployment_target }}, got $MIN_OS"
+            exit 1
+          fi
 
       - name: Stage native binary
         shell: bash
         env:
           PLATFORM: ${{ matrix.platform }}
-          EXTENSION: ${{ matrix.extension }}
+          RUST_TARGET: ${{ matrix.rust_target }}
         run: |
           mkdir -p "native/${PLATFORM}"
-          cp "apps/tui/target/release/eersnington-tui${EXTENSION}" "native/${PLATFORM}/eersnington${EXTENSION}"
-          if [ "${EXTENSION}" = "" ]; then
-            chmod 755 "native/${PLATFORM}/eersnington"
-          fi
+          install -m 755 "apps/tui/target/${RUST_TARGET}/release/eersnington-tui" "native/${PLATFORM}/eersnington"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -153,6 +185,8 @@ jobs:
           chmod 755 apps/tui/dist/bin/darwin-x64/eersnington
           chmod 755 apps/tui/dist/bin/linux-arm64/eersnington
           chmod 755 apps/tui/dist/bin/linux-x64/eersnington
+          chmod 755 apps/tui/dist/bin/linux-arm64-musl/eersnington
+          chmod 755 apps/tui/dist/bin/linux-x64-musl/eersnington
 
       - name: Assemble npm package
         working-directory: apps/tui

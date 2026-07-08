@@ -7,10 +7,12 @@ import { fileURLToPath } from "node:url";
 const platform = process.platform;
 const arch = process.arch;
 const extension = platform === "win32" ? ".exe" : "";
+const report = process.report?.getReport();
+const libc = platform === "linux" && !report?.header?.glibcVersionRuntime ? "-musl" : "";
 const binary = join(
   dirname(fileURLToPath(import.meta.url)),
   "bin",
-  `${platform}-${arch}`,
+  `${platform}-${arch}${libc}`,
   `eersnington${extension}`,
 );
 
