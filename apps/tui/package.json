@@ -1,6 +1,6 @@
 {
   "name": "eersnington",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": false,
   "description": "OpenTUI version of my site eers.dev",
   "keywords": [
@@ -17,33 +17,22 @@
     "directory": "apps/tui"
   },
   "bin": {
-    "eersnington": "./dist/index.js"
+    "eersnington": "./dist/cli.js",
+    "sreenarayanan": "./dist/cli.js"
   },
   "files": [
     "dist",
     "README.md"
   ],
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/cli.js",
   "scripts": {
-    "dev": "bun run --watch src/index.tsx",
-    "build": "bun run scripts/build.ts",
-    "check-types": "tsc --noEmit",
-    "prepublishOnly": "bun run check-types && bun run build"
+    "dev": "cargo run --manifest-path Cargo.toml",
+    "build": "bun run scripts/build-npm.ts",
+    "check-types": "bun run scripts/check-npm-package.ts",
+    "prepublishOnly": "bun run build && bun run check-types"
   },
   "dependencies": {},
-  "devDependencies": {
-    "@opentui/core": "0.4.2",
-    "@opentui/solid": "0.4.2",
-    "@types/bun": "latest",
-    "solid-js": "1.9.12"
-  },
-  "optionalDependencies": {
-    "@opentui/core-darwin-arm64": "0.4.2",
-    "@opentui/core-darwin-x64": "0.4.2",
-    "@opentui/core-linux-arm64": "0.4.2",
-    "@opentui/core-linux-x64": "0.4.2",
-    "@opentui/core-win32-arm64": "0.4.2",
-    "@opentui/core-win32-x64": "0.4.2"
-  }
+  "devDependencies": {},
+  "optionalDependencies": {}
 }

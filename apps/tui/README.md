@@ -1,6 +1,6 @@
 # eersnington
 
-This is an OpenTOOEE version of my site eers.dev which I think is very cool.
+This is an Rust TUI version of my site eers.dev which I think is very cool.
 
 ```sh
 bunx eersnington
@@ -13,7 +13,7 @@ You can also use `npx` if you don't have Bun installed
 npx eersnington
 ```
 
-This CLI is powered by OpenTUI and runs on Bun.
+This CLI is powered by Ratatui
 
 For local development:
 
