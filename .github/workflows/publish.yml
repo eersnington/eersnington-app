@@ -54,7 +54,15 @@ jobs:
             exit 1
           fi
 
-          for package_name in sreenarayanan eersnington; do
+          for package_name in \
+            sreenarayanan \
+            eersnington \
+            @eersnington/tui-darwin-arm64 \
+            @eersnington/tui-darwin-x64 \
+            @eersnington/tui-linux-arm64-gnu \
+            @eersnington/tui-linux-x64-gnu \
+            @eersnington/tui-linux-arm64-musl \
+            @eersnington/tui-linux-x64-musl; do
             if npm view "${package_name}@${INPUT_VERSION}" version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
               printf 'Refusing to publish: %s@%s already exists on npm. The registry was not changed.\n' "${package_name}" "${INPUT_VERSION}" >&2
               exit 1
@@ -190,6 +198,8 @@ jobs:
 
       - name: Assemble npm package
         working-directory: apps/tui
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
         run: bun run assemble
 
       - name: Check Rust formatting
@@ -203,11 +213,15 @@ jobs:
 
       - name: Check npm package
         working-directory: apps/tui
-        run: REQUIRE_ALL_NATIVE_BINARIES=1 bun run check-types
+        run: REQUIRE_ALL_NATIVE_PACKAGES=1 bun run check-types
 
       - name: Preview npm package
         working-directory: apps/tui
-        run: npm pack --dry-run
+        run: |
+          npm pack --dry-run
+          for package_dir in npm/native/*; do
+            (cd "${package_dir}" && npm pack --dry-run)
+          done
 
       - name: Publish npm packages (OIDC, no token)
         env:
@@ -215,9 +229,13 @@ jobs:
           NPM_TAG: ${{ inputs.npm_tag }}
         working-directory: apps/tui
         run: |
+          for package_dir in npm/native/*; do
+            printf 'Publishing %s@%s from %s\n' "$(node -p "require('./${package_dir}/package.json').name")" "${INPUT_VERSION}" "${package_dir}"
+            (cd "${package_dir}" && npm publish --provenance --access public --tag "${NPM_TAG}" --ignore-scripts)
+          done
+
           for package_name in sreenarayanan eersnington; do
             npm pkg set "name=${package_name}"
-            npm pkg set "version=${INPUT_VERSION}"
             npm pkg set 'bin.eersnington=./dist/cli.js'
             npm pkg set 'bin.sreenarayanan=./dist/cli.js'
 

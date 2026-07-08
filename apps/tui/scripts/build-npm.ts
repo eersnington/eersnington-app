@@ -1,15 +1,18 @@
-import { mkdir, rm } from "node:fs/promises";
-import { dirname } from "node:path";
+import { readFile, rm } from "node:fs/promises";
 import { currentTarget } from "./package-targets";
+import { writeNativePackage } from "./write-native-package";
 
 const packageRoot = new URL("..", import.meta.url);
 const distRoot = new URL("dist/", packageRoot);
 const target = currentTarget();
-const extension = process.platform === "win32" ? ".exe" : "";
-const cargoBinary = new URL(`target/release/eersnington-tui${extension}`, packageRoot);
-const distBinary = new URL(`bin/${target.platform}/${target.binary}`, distRoot);
+const cargoBinary = new URL("target/release/eersnington-tui", packageRoot);
+const nativeRoot = new URL("npm/native/", packageRoot);
+const packageJson = JSON.parse(await readFile(new URL("package.json", packageRoot), "utf8")) as {
+  readonly version: string;
+};
 
 await rm(distRoot, { force: true, recursive: true });
+await rm(nativeRoot, { force: true, recursive: true });
 
 const build = Bun.spawn(["cargo", "build", "--release", "--manifest-path", "Cargo.toml"], {
   cwd: packageRoot.pathname,
@@ -23,19 +26,11 @@ if (exitCode !== 0) {
   process.exit(exitCode);
 }
 
-await mkdir(dirname(distBinary.pathname), { recursive: true });
-await Bun.write(distBinary, Bun.file(cargoBinary));
-
-if (target.executable) {
-  const chmod = Bun.spawn(["chmod", "755", distBinary.pathname], {
-    stdout: "inherit",
-    stderr: "inherit",
-  });
-  const chmodExitCode = await chmod.exited;
-  if (chmodExitCode !== 0) {
-    console.error(`chmod failed for ${distBinary.pathname} with exit code ${chmodExitCode}.`);
-    process.exit(chmodExitCode);
-  }
-}
+await writeNativePackage({
+  packageRoot,
+  target,
+  version: packageJson.version,
+  sourceBinary: cargoBinary,
+});
 
 await import("./write-cli");

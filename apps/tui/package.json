@@ -21,7 +21,7 @@
     "sreenarayanan": "./dist/cli.js"
   },
   "files": [
-    "dist",
+    "dist/cli.js",
     "README.md"
   ],
   "type": "module",

@@ -32,7 +32,7 @@
     "build": "turbo build",
     "check-types": "turbo check-types",
     "clean": "bun run clean:build && rm -rf node_modules apps/*/node_modules packages/*/node_modules",
-    "clean:build": "rm -rf .turbo apps/*/.turbo packages/*/.turbo dist apps/*/dist packages/*/dist build apps/*/build packages/*/build target apps/*/target packages/*/target coverage apps/*/coverage packages/*/coverage .cache apps/*/.cache packages/*/.cache *.tsbuildinfo apps/*/*.tsbuildinfo packages/*/*.tsbuildinfo *.tgz apps/*/*.tgz packages/*/*.tgz && cargo clean --manifest-path apps/tui/Cargo.toml",
+    "clean:build": "rm -rf .turbo apps/*/.turbo packages/*/.turbo dist apps/*/dist packages/*/dist apps/*/npm packages/*/npm build apps/*/build packages/*/build target apps/*/target packages/*/target coverage apps/*/coverage packages/*/coverage .cache apps/*/.cache packages/*/.cache *.tsbuildinfo apps/*/*.tsbuildinfo packages/*/*.tsbuildinfo *.tgz apps/*/*.tgz packages/*/*.tgz && cargo clean --manifest-path apps/tui/Cargo.toml",
     "dev:web": "turbo -F web dev",
     "dev:tui": "turbo -F eersnington dev",
     "check": "oxlint && oxfmt --write"

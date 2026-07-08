@@ -1,24 +1,27 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
 
 const platform = process.platform;
 const arch = process.arch;
-const extension = platform === "win32" ? ".exe" : "";
 const report = process.report?.getReport();
-const libc = platform === "linux" && !report?.header?.glibcVersionRuntime ? "-musl" : "";
-const binary = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "bin",
-  `${platform}-${arch}${libc}`,
-  `eersnington${extension}`,
-);
+const libc = platform === "linux" && !report?.header?.glibcVersionRuntime ? "musl" : "gnu";
+const nativePackageName = getNativePackageName(platform, arch, libc);
+const require = createRequire(import.meta.url);
 
-if (!existsSync(binary)) {
+if (!nativePackageName) {
   console.error(
-    `Unsupported platform or missing binary: ${platform}-${arch}. Reinstall the package or open an issue with your platform details.`,
+    `Unsupported platform: ${platform}-${arch}. Open an issue with your platform details if you need support.`,
+  );
+  process.exit(1);
+}
+
+let binary;
+try {
+  binary = require.resolve(`${nativePackageName}/bin/eersnington`);
+} catch {
+  console.error(
+    `Missing native package for ${platform}-${arch}${platform === "linux" ? `-${libc}` : ""}. Reinstall eersnington with optional dependencies enabled, or install ${nativePackageName} manually.`,
   );
   process.exit(1);
 }
@@ -31,3 +34,31 @@ if (result.error) {
 }
 
 process.exit(result.status ?? 1);
+
+function getNativePackageName(platform, arch, libc) {
+  if (platform === "darwin" && arch === "arm64") {
+    return "@eersnington/tui-darwin-arm64";
+  }
+
+  if (platform === "darwin" && arch === "x64") {
+    return "@eersnington/tui-darwin-x64";
+  }
+
+  if (platform === "linux" && arch === "arm64" && libc === "musl") {
+    return "@eersnington/tui-linux-arm64-musl";
+  }
+
+  if (platform === "linux" && arch === "x64" && libc === "musl") {
+    return "@eersnington/tui-linux-x64-musl";
+  }
+
+  if (platform === "linux" && arch === "arm64") {
+    return "@eersnington/tui-linux-arm64-gnu";
+  }
+
+  if (platform === "linux" && arch === "x64") {
+    return "@eersnington/tui-linux-x64-gnu";
+  }
+
+  return undefined;
+}

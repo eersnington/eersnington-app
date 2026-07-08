@@ -1,5 +1,5 @@
 import { constants } from "node:fs";
-import { access, readdir, readFile, stat } from "node:fs/promises";
+import { access, readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -9,15 +9,23 @@ const packageRoot = fileURLToPath(new URL("..", import.meta.url));
 const binEntry = "./dist/cli.js";
 const nodeShebang = "#!/usr/bin/env node";
 const requireDist = process.env.REQUIRE_DIST !== "0";
-const requireAllNativeBinaries = process.env.REQUIRE_ALL_NATIVE_BINARIES === "1";
+const requireAllNativePackages =
+  process.env.REQUIRE_ALL_NATIVE_PACKAGES === "1" ||
+  process.env.REQUIRE_ALL_NATIVE_BINARIES === "1";
 
 const packageJsonPath = join(packageRoot, "package.json");
 const launcherPath = join(packageRoot, "dist", "cli.js");
-const binRoot = join(packageRoot, "dist", "bin");
+const nativeRoot = join(packageRoot, "npm", "native");
 
 type PackageJson = {
   readonly bin?: Record<string, string>;
+  readonly optionalDependencies?: Record<string, string>;
   readonly files?: readonly string[];
+  readonly name?: string;
+  readonly version?: string;
+  readonly os?: readonly string[];
+  readonly cpu?: readonly string[];
+  readonly libc?: readonly string[];
 };
 
 function die(message: string): never {
@@ -54,7 +62,7 @@ for (const command of ["eersnington", "sreenarayanan"] as const) {
   }
 }
 
-for (const publishedFile of ["dist", "README.md"] as const) {
+for (const publishedFile of ["dist/cli.js", "README.md"] as const) {
   if (!packageJson.files?.includes(publishedFile)) {
     die(`package.json files must include "${publishedFile}".`);
   }
@@ -79,41 +87,64 @@ if (!launcher.startsWith(nodeShebang)) {
 }
 await assertExecutable(launcherPath);
 
-if (!(await exists(binRoot))) {
+if (!(await exists(nativeRoot))) {
   if (requireDist) {
-    die("dist/bin is missing. Run bun run build before checking the package.");
+    die("npm/native is missing. Run bun run build before checking the package.");
   }
   process.exit(0);
 }
 
-const targetsToCheck = requireAllNativeBinaries
+const targetsToCheck = requireAllNativePackages
   ? nativeTargets
-  : await Promise.all(
-      (await readdir(binRoot)).map(async (platform) => {
-        const directory = join(binRoot, platform);
-        if (!(await stat(directory)).isDirectory()) {
-          return null;
-        }
-
-        return (
-          nativeTargets.find((target) => target.platform === platform) ?? {
-            platform,
-            binary: platform.startsWith("win32-") ? "eersnington.exe" : "eersnington",
-            executable: !platform.startsWith("win32-"),
-          }
-        );
-      }),
-    );
+  : (await readdir(nativeRoot, { withFileTypes: true }))
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => nativeTargets.find((target) => target.platform === entry.name) ?? null);
 
 for (const target of targetsToCheck) {
   if (!target) {
     continue;
   }
 
-  const binaryPath = join(packageRoot, "dist", "bin", target.platform, target.binary);
+  const nativePackagePath = join(packageRoot, "npm", "native", target.platform, "package.json");
+  if (!(await exists(nativePackagePath))) {
+    die(`Missing native package manifest: npm/native/${target.platform}/package.json.`);
+  }
+
+  const nativePackage = JSON.parse(await readFile(nativePackagePath, "utf8")) as PackageJson;
+  if (nativePackage.name !== target.packageName) {
+    die(`npm/native/${target.platform}/package.json must be named ${target.packageName}.`);
+  }
+
+  if (nativePackage.version !== packageJson.version) {
+    die(`npm/native/${target.platform}/package.json version must match the main package version.`);
+  }
+
+  if (JSON.stringify(nativePackage.os) !== JSON.stringify(target.os)) {
+    die(`npm/native/${target.platform}/package.json has the wrong os constraint.`);
+  }
+
+  if (JSON.stringify(nativePackage.cpu) !== JSON.stringify(target.cpu)) {
+    die(`npm/native/${target.platform}/package.json has the wrong cpu constraint.`);
+  }
+
+  if (JSON.stringify(nativePackage.libc) !== JSON.stringify(target.libc)) {
+    die(`npm/native/${target.platform}/package.json has the wrong libc constraint.`);
+  }
+
+  const binaryPath = join(packageRoot, "npm", "native", target.platform, "bin", target.binary);
   if (!(await exists(binaryPath))) {
-    die(`Missing native binary: dist/bin/${target.platform}/${target.binary}.`);
+    die(`Missing native binary: npm/native/${target.platform}/bin/${target.binary}.`);
   }
 
   await assertExecutable(binaryPath, target);
+}
+
+if (requireAllNativePackages) {
+  for (const target of nativeTargets) {
+    if (packageJson.optionalDependencies?.[target.packageName] !== packageJson.version) {
+      die(
+        `package.json optionalDependencies.${target.packageName} must equal ${packageJson.version}.`,
+      );
+    }
+  }
 }
