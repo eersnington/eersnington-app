@@ -5,7 +5,8 @@
   "description": "TUI version of my site eers.dev in Rust",
   "keywords": [
     "bun",
-    "opentui",
+    "ratatui",
+    "personal",
     "portfolio",
     "terminal",
     "tui"

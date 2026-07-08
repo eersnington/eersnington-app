@@ -13,7 +13,7 @@ You can also use `npx` if you don't have Bun installed
 npx eersnington
 ```
 
-This CLI is powered by Ratatui
+This CLI is powered by [Ratatui](https://github.com/ratatui/ratatui)
 
 For local development:
 
