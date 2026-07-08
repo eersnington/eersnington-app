@@ -2,7 +2,7 @@
   "name": "eersnington",
   "version": "0.4.0",
   "private": false,
-  "description": "OpenTUI version of my site eers.dev",
+  "description": "TUI version of my site eers.dev in Rust",
   "keywords": [
     "bun",
     "opentui",
