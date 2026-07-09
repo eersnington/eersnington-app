@@ -19,7 +19,7 @@
     },
     "apps/tui": {
       "name": "eersnington",
-      "version": "0.6.1",
+      "version": "0.6.2",
       "bin": {
         "eersnington": "./dist/cli.js",
         "sreenarayanan": "./dist/cli.js",
@@ -30,12 +30,12 @@
         "typescript": "catalog:",
       },
       "optionalDependencies": {
-        "@eersnington/tui-darwin-arm64": "0.6.1",
-        "@eersnington/tui-darwin-x64": "0.6.1",
-        "@eersnington/tui-linux-arm64-gnu": "0.6.1",
-        "@eersnington/tui-linux-arm64-musl": "0.6.1",
-        "@eersnington/tui-linux-x64-gnu": "0.6.1",
-        "@eersnington/tui-linux-x64-musl": "0.6.1",
+        "@eersnington/tui-darwin-arm64": "0.6.2",
+        "@eersnington/tui-darwin-x64": "0.6.2",
+        "@eersnington/tui-linux-arm64-gnu": "0.6.2",
+        "@eersnington/tui-linux-arm64-musl": "0.6.2",
+        "@eersnington/tui-linux-x64-gnu": "0.6.2",
+        "@eersnington/tui-linux-x64-musl": "0.6.2",
       },
     },
     "apps/web": {
