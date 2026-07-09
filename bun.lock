@@ -19,7 +19,7 @@
     },
     "apps/tui": {
       "name": "eersnington",
-      "version": "0.6.0",
+      "version": "0.6.1",
       "bin": {
         "eersnington": "./dist/cli.js",
         "sreenarayanan": "./dist/cli.js",
@@ -30,12 +30,12 @@
         "typescript": "catalog:",
       },
       "optionalDependencies": {
-        "@eersnington/tui-darwin-arm64": "0.6.0",
-        "@eersnington/tui-darwin-x64": "0.6.0",
-        "@eersnington/tui-linux-arm64-gnu": "0.6.0",
-        "@eersnington/tui-linux-arm64-musl": "0.6.0",
-        "@eersnington/tui-linux-x64-gnu": "0.6.0",
-        "@eersnington/tui-linux-x64-musl": "0.6.0",
+        "@eersnington/tui-darwin-arm64": "0.6.1",
+        "@eersnington/tui-darwin-x64": "0.6.1",
+        "@eersnington/tui-linux-arm64-gnu": "0.6.1",
+        "@eersnington/tui-linux-arm64-musl": "0.6.1",
+        "@eersnington/tui-linux-x64-gnu": "0.6.1",
+        "@eersnington/tui-linux-x64-musl": "0.6.1",
       },
     },
     "apps/web": {
@@ -92,18 +92,6 @@
     "@cspotcode/source-map-support": ["@cspotcode/source-map-support@0.8.1", "", { "dependencies": { "@jridgewell/trace-mapping": "0.3.9" } }, "sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw=="],
 
     "@eersnington/config": ["@eersnington/config@workspace:packages/config"],
-
-    "@eersnington/tui-darwin-arm64": ["@eersnington/tui-darwin-arm64@0.6.0", "", { "os": "darwin", "cpu": "arm64" }, "sha512-VLJGzhX6WMbfRudt+vQDvawvRGtix3ZIfJa+ur/I83KZJaXM2sOUUR/F/mr40JcElDSXQPUTne9Ub+l5DW+ZNg=="],
-
-    "@eersnington/tui-darwin-x64": ["@eersnington/tui-darwin-x64@0.6.0", "", { "os": "darwin", "cpu": "x64" }, "sha512-heW6iQAJOEaeZSY0P4rPMI+DPf8qibxylk/E4j7m6Ra9mgSRjmsQWnAto/mE0fLp57yvHfxxi4HF9zjcfcloVw=="],
-
-    "@eersnington/tui-linux-arm64-gnu": ["@eersnington/tui-linux-arm64-gnu@0.6.0", "", { "os": "linux", "cpu": "arm64" }, "sha512-eXkBFRQE0Z1ZKwfx1h7KPbb5NOGdFJ9VffU6a23by4+QBmtDQxMxC3KYUGs62WLPgQcVBuZnZ+tUotE6gXKcZA=="],
-
-    "@eersnington/tui-linux-arm64-musl": ["@eersnington/tui-linux-arm64-musl@0.6.0", "", { "os": "linux", "cpu": "arm64" }, "sha512-OUAvqQLyLsLQeSxryRZU3D4JfoaoO903MIsl7mkW5yrQ+P+LwYHrGHbVrcWwUc/YLVG6oMvyo+6mn0hqZQ0gKw=="],
-
-    "@eersnington/tui-linux-x64-gnu": ["@eersnington/tui-linux-x64-gnu@0.6.0", "", { "os": "linux", "cpu": "x64" }, "sha512-/OKH3JDLLQW2+jJCRwrhP+djENzgbgxvH6GMiyJJLA05Haywtzj9Hdo0uv77L3MOMAc8MkXDXT2N+WG16OIQGA=="],
-
-    "@eersnington/tui-linux-x64-musl": ["@eersnington/tui-linux-x64-musl@0.6.0", "", { "os": "linux", "cpu": "x64" }, "sha512-gjW5OSQrOBsiNfv3V+0COcPpy21H3bgRG/Ct4tNaqHCHTDeVD59vSJIviy2gydACyVaXYt9s+9t9HtLlIeX41A=="],
 
     "@emnapi/core": ["@emnapi/core@1.11.1", "", { "dependencies": { "@emnapi/wasi-threads": "1.2.2", "tslib": "^2.4.0" } }, "sha512-RSvbQmHzdKzNsLYa/wHrbc3KN4sYLKAdPZxqiM2HATqv/SBk2/ENSHpvXGaLOMcsAyz0poEGqkmmKYG3OWiJEQ=="],
 
