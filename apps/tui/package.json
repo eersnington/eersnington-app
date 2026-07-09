@@ -1,6 +1,6 @@
 {
   "name": "eersnington",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": false,
   "description": "TUI version of my site eers.dev in Rust",
   "keywords": [
@@ -42,11 +42,11 @@
     "typescript": "catalog:"
   },
   "optionalDependencies": {
-    "@eersnington/tui-darwin-arm64": "0.6.0",
-    "@eersnington/tui-darwin-x64": "0.6.0",
-    "@eersnington/tui-linux-arm64-gnu": "0.6.0",
-    "@eersnington/tui-linux-arm64-musl": "0.6.0",
-    "@eersnington/tui-linux-x64-gnu": "0.6.0",
-    "@eersnington/tui-linux-x64-musl": "0.6.0"
+    "@eersnington/tui-darwin-arm64": "0.6.1",
+    "@eersnington/tui-darwin-x64": "0.6.1",
+    "@eersnington/tui-linux-arm64-gnu": "0.6.1",
+    "@eersnington/tui-linux-arm64-musl": "0.6.1",
+    "@eersnington/tui-linux-x64-gnu": "0.6.1",
+    "@eersnington/tui-linux-x64-musl": "0.6.1"
   }
 }
