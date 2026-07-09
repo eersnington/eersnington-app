@@ -8,6 +8,7 @@ const report = process.report?.getReport();
 const libc = platform === "linux" && !report?.header?.glibcVersionRuntime ? "musl" : "gnu";
 const nativePackageName = getNativePackageName(platform, arch, libc);
 const require = createRequire(import.meta.url);
+const packageVersion = getPackageVersion();
 
 if (!nativePackageName) {
   console.error(
@@ -20,10 +21,21 @@ let binary;
 try {
   binary = require.resolve(`${nativePackageName}/bin/eersnington`);
 } catch {
+  const packageWithVersion = packageVersion
+    ? `${nativePackageName}@${packageVersion}`
+    : nativePackageName;
   console.error(
-    `Missing native package for ${platform}-${arch}${platform === "linux" ? `-${libc}` : ""}. Reinstall eersnington with optional dependencies enabled, or install ${nativePackageName} manually.`,
+    `Missing native package ${nativePackageName} for ${platform}-${arch}${platform === "linux" ? `-${libc}` : ""}.\n` +
+      "The eersnington wrapper installed, but your package manager did not install the platform optional dependency.\n" +
+      `Try reinstalling with optional dependencies enabled, or install ${packageWithVersion} manually.\n` +
+      `If you use a package release-age policy, exclude eersnington and ${nativePackageName} from that policy.`,
   );
   process.exit(1);
+}
+
+if (process.argv[2] === "--version" || process.argv[2] === "-v") {
+  console.log(packageVersion ?? "unknown");
+  process.exit(0);
 }
 
 const result = spawnSync(binary, process.argv.slice(2), { stdio: "inherit" });
@@ -61,4 +73,12 @@ function getNativePackageName(platform, arch, libc) {
   }
 
   return undefined;
+}
+
+function getPackageVersion() {
+  try {
+    return require("../package.json").version;
+  } catch {
+    return undefined;
+  }
 }

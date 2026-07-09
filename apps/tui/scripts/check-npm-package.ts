@@ -68,6 +68,14 @@ for (const publishedFile of ["dist/cli.js", "README.md"] as const) {
   }
 }
 
+for (const target of nativeTargets) {
+  if (packageJson.optionalDependencies?.[target.packageName] !== packageJson.version) {
+    die(
+      `package.json optionalDependencies.${target.packageName} must equal ${packageJson.version}.`,
+    );
+  }
+}
+
 for (const sourceFile of ["Cargo.toml", "README.md"] as const) {
   if (!(await exists(join(packageRoot, sourceFile)))) {
     die(`${sourceFile} is missing from apps/tui.`);
@@ -137,14 +145,4 @@ for (const target of targetsToCheck) {
   }
 
   await assertExecutable(binaryPath, target);
-}
-
-if (requireAllNativePackages) {
-  for (const target of nativeTargets) {
-    if (packageJson.optionalDependencies?.[target.packageName] !== packageJson.version) {
-      die(
-        `package.json optionalDependencies.${target.packageName} must equal ${packageJson.version}.`,
-      );
-    }
-  }
 }

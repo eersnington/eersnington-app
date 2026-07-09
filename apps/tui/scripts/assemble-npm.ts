@@ -31,17 +31,15 @@ for (const target of nativeTargets) {
   });
 }
 
-if (process.env.INPUT_VERSION) {
-  await writeFile(
-    packageJsonUrl,
-    `${JSON.stringify(
-      {
-        ...packageJson,
-        version,
-        optionalDependencies: nativePackageDependencies(version),
-      },
-      null,
-      2,
-    )}\n`,
-  );
-}
+await writeFile(
+  packageJsonUrl,
+  `${JSON.stringify(
+    {
+      ...packageJson,
+      version,
+      optionalDependencies: nativePackageDependencies(version),
+    },
+    null,
+    2,
+  )}\n`,
+);

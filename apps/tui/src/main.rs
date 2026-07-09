@@ -46,6 +46,11 @@ impl Drop for TerminalGuard {
 }
 
 fn main() -> Result<()> {
+    if std::env::var_os("EERSNINGTON_NATIVE_SMOKE").is_some() {
+        println!("eersnington native ok");
+        return Ok(());
+    }
+
     let _guard = TerminalGuard::enter()?;
     let backend = CrosstermBackend::new(io::stdout());
     let mut terminal = Terminal::new(backend)?;
