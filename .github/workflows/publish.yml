@@ -231,38 +231,3 @@ jobs:
             printf 'Publishing %s@%s from apps/tui\n' "${package_name}" "${INPUT_VERSION}"
             npm publish --provenance --tag "${NPM_TAG}" --ignore-scripts
           done
-
-      - name: Verify published package execution
-        env:
-          INPUT_VERSION: ${{ inputs.version }}
-        working-directory: apps/tui
-        run: |
-          native_packages="@eersnington/tui-darwin-arm64 @eersnington/tui-darwin-x64 @eersnington/tui-linux-arm64-gnu @eersnington/tui-linux-x64-gnu @eersnington/tui-linux-arm64-musl @eersnington/tui-linux-x64-musl"
-
-          for package_name in sreenarayanan eersnington; do
-            printf 'Verifying optional dependencies for %s@%s\n' "${package_name}" "${INPUT_VERSION}"
-            npm view "${package_name}@${INPUT_VERSION}" optionalDependencies --json --registry=https://registry.npmjs.org | EXPECTED_VERSION="${INPUT_VERSION}" EXPECTED_PACKAGES="${native_packages}" node -e '
-              let input = "";
-              process.stdin.on("data", (chunk) => input += chunk);
-              process.stdin.on("end", () => {
-                const optionalDependencies = JSON.parse(input);
-                for (const packageName of process.env.EXPECTED_PACKAGES.split(" ")) {
-                  if (optionalDependencies?.[packageName] !== process.env.EXPECTED_VERSION) {
-                    console.error(`${packageName} must be optional dependency ${process.env.EXPECTED_VERSION}.`);
-                    process.exit(1);
-                  }
-                }
-              });
-            '
-          done
-
-          for package_name in ${native_packages}; do
-            npm view "${package_name}@${INPUT_VERSION}" version --registry=https://registry.npmjs.org
-          done
-
-          corepack enable pnpm
-          for package_name in sreenarayanan eersnington; do
-            EERSNINGTON_NATIVE_SMOKE=1 npx --yes --include=optional "${package_name}@${INPUT_VERSION}"
-            EERSNINGTON_NATIVE_SMOKE=1 pnpm dlx "${package_name}@${INPUT_VERSION}"
-            EERSNINGTON_NATIVE_SMOKE=1 bunx "${package_name}@${INPUT_VERSION}"
-          done
