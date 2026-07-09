@@ -18,8 +18,7 @@ pub fn draw(frame: &mut Frame<'_>, app: &App) {
     frame.render_widget(main, root);
 
     let [body, status] = Layout::vertical([Constraint::Min(1), Constraint::Length(1)]).areas(root);
-    let [gutter, content] =
-        Layout::horizontal([Constraint::Length(6), Constraint::Min(1)]).areas(body);
+    let [gutter, content] = content_columns(body);
 
     draw_gutter(frame, gutter, palette);
 
@@ -32,6 +31,23 @@ pub fn draw(frame: &mut Frame<'_>, app: &App) {
     }
 
     draw_status_line(frame, status, app, palette);
+}
+
+pub fn content_area(root: Rect) -> Rect {
+    let [body, _status] = Layout::vertical([Constraint::Min(1), Constraint::Length(1)]).areas(root);
+    let [_gutter, content] = content_columns(body);
+    content
+}
+
+pub fn skill_content_area(area: Rect) -> Rect {
+    area.inner(Margin {
+        horizontal: 1,
+        vertical: 1,
+    })
+}
+
+fn content_columns(body: Rect) -> [Rect; 2] {
+    Layout::horizontal([Constraint::Length(6), Constraint::Min(1)]).areas(body)
 }
 
 fn draw_gutter(frame: &mut Frame<'_>, area: Rect, palette: Palette) {

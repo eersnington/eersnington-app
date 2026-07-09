@@ -105,6 +105,10 @@ impl App {
         }
     }
 
+    pub fn clamp_skill_scroll(&mut self, max_scroll: u16) {
+        self.skill_scroll = self.skill_scroll.min(max_scroll);
+    }
+
     pub fn complete_open_url(
         &mut self,
         title: &str,
@@ -155,11 +159,11 @@ impl App {
                 self.should_quit = true;
                 Vec::new()
             }
-            Command::MoveDown => {
+            Command::MoveBy(delta) if delta > 0 => {
                 self.selected_link = (self.selected_link + 1).min(LINKS.len() - 1);
                 Vec::new()
             }
-            Command::MoveUp => {
+            Command::MoveBy(delta) if delta < 0 => {
                 self.selected_link = self.selected_link.saturating_sub(1);
                 Vec::new()
             }
@@ -174,12 +178,8 @@ impl App {
     fn handle_skill(&mut self, command: Command) -> Vec<Effect> {
         match command {
             Command::RetrySkill => self.start_skill_fetch(),
-            Command::MoveDown => {
-                self.skill_scroll = self.skill_scroll.saturating_add(1);
-                Vec::new()
-            }
-            Command::MoveUp => {
-                self.skill_scroll = self.skill_scroll.saturating_sub(1);
+            Command::MoveBy(delta) => {
+                self.scroll_skill_by(delta);
                 Vec::new()
             }
             _ => Vec::new(),
@@ -195,10 +195,12 @@ impl App {
 
     fn handle_themes(&mut self, command: Command) -> Vec<Effect> {
         match command {
-            Command::MoveDown => {
+            Command::MoveBy(delta) if delta > 0 => {
                 self.selected_theme = (self.selected_theme + 1).min(THEMES.len() - 1)
             }
-            Command::MoveUp => self.selected_theme = self.selected_theme.saturating_sub(1),
+            Command::MoveBy(delta) if delta < 0 => {
+                self.selected_theme = self.selected_theme.saturating_sub(1)
+            }
             Command::Enter => self.view = View::Home,
             _ => {}
         }
@@ -268,6 +270,14 @@ impl App {
         vec![Effect::FetchSkill]
     }
 
+    fn scroll_skill_by(&mut self, delta: i16) {
+        if delta < 0 {
+            self.skill_scroll = self.skill_scroll.saturating_sub(delta.unsigned_abs());
+        } else {
+            self.skill_scroll = self.skill_scroll.saturating_add(delta as u16);
+        }
+    }
+
     fn show_status(&mut self, text: String, tone: StatusTone, now: Instant) {
         self.status = Some(StatusMessage {
             text,
@@ -286,11 +296,11 @@ mod tests {
         let mut app = App::default();
         let now = Instant::now();
 
-        app.handle(Command::MoveUp, now);
+        app.handle(Command::MoveBy(-1), now);
         assert_eq!(app.selected_link, 0);
 
         for _ in 0..100 {
-            app.handle(Command::MoveDown, now);
+            app.handle(Command::MoveBy(1), now);
         }
         assert_eq!(app.selected_link, LINKS.len() - 1);
     }
@@ -316,5 +326,45 @@ mod tests {
         app.handle(Command::KeyChar('m'), now);
 
         assert_eq!(app.view, View::Contact);
+    }
+
+    #[test]
+    fn handle_skill_should_scroll_keyboard_by_one_line() {
+        let mut app = App {
+            view: View::Skill,
+            ..App::default()
+        };
+        let now = Instant::now();
+
+        app.handle(Command::MoveBy(1), now);
+        assert_eq!(app.skill_scroll, 1);
+
+        app.handle(Command::MoveBy(-1), now);
+        assert_eq!(app.skill_scroll, 0);
+    }
+
+    #[test]
+    fn handle_skill_should_scroll_mouse_by_five_lines() {
+        let mut app = App {
+            view: View::Skill,
+            ..App::default()
+        };
+        let now = Instant::now();
+
+        app.handle(Command::MoveBy(crate::event::MOUSE_SCROLL_LINES), now);
+
+        assert_eq!(app.skill_scroll, 5);
+    }
+
+    #[test]
+    fn clamp_skill_scroll_should_cap_overscroll() {
+        let mut app = App {
+            skill_scroll: 100,
+            ..App::default()
+        };
+
+        app.clamp_skill_scroll(12);
+
+        assert_eq!(app.skill_scroll, 12);
     }
 }
