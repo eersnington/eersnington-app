@@ -4,6 +4,9 @@
 pre-commit:
   parallel: true
   jobs:
+    - name: tui package versions
+      glob: "apps/tui/package.json"
+      run: bun run --cwd apps/tui check-package-versions
     - name: oxlint
       glob: "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}"
       run: bun oxlint --fix {staged_files}

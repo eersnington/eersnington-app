@@ -31,7 +31,8 @@
     "dev": "cargo run --manifest-path Cargo.toml",
     "build": "bun run scripts/build-npm.ts",
     "assemble": "bun run scripts/assemble-npm.ts",
-    "check-types": "tsc --noEmit && REQUIRE_DIST=1 bun run scripts/check-npm-package.ts",
+    "check-package-versions": "bun run scripts/check-package-versions.ts",
+    "check-types": "bun run check-package-versions && tsc --noEmit && REQUIRE_DIST=1 bun run scripts/check-npm-package.ts",
     "prepublishOnly": "bun run build && bun run check-types"
   },
   "dependencies": {},
