@@ -6,9 +6,6 @@ on:
       version:
         description: Exact version to publish for both packages, e.g. 0.1.1
         required: true
-      confirm:
-        description: Type publish both packages @<version>
-        required: true
       npm_tag:
         description: npm dist-tag
         required: true
@@ -39,18 +36,10 @@ jobs:
 
       - name: Validate release request
         env:
-          INPUT_CONFIRM: ${{ inputs.confirm }}
           INPUT_VERSION: ${{ inputs.version }}
         run: |
-          expected_confirm="publish both packages @${INPUT_VERSION}"
-
           if ! printf '%s' "${INPUT_VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'; then
             printf 'Refusing to publish: workflow input version "%s" is not a valid semver version. No package was published.\n' "${INPUT_VERSION}" >&2
-            exit 1
-          fi
-
-          if [ "${INPUT_CONFIRM}" != "${expected_confirm}" ]; then
-            printf 'Refusing to publish: confirmation must exactly equal "%s". No package was published.\n' "${expected_confirm}" >&2
             exit 1
           fi
 
