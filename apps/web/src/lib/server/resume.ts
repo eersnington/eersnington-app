@@ -1,10 +1,14 @@
 import type { RequestEvent } from "@sveltejs/kit";
+import fallbackMarkdown from "./resume-fallback.md?raw";
 
 const RESUME_URL =
   "https://unruly-double-baf.notion.site/Heyya-this-is-my-resume-3aefba2a3cbf805ca203fa01417de2d5";
 const RESUME_READER_URL = `https://r.jina.ai/${RESUME_URL}`;
 const RESUME_ORIGIN = new URL(RESUME_URL).origin;
 const RESUME_CACHE_TTL = 60 * 60 * 24;
+const RESUME_FALLBACK_CACHE_TTL = 60 * 5;
+const RESUME_CONTENT_MARKER = "Sreenarayanan Sreekanth";
+const RESUME_CACHE_VERSION = "v2";
 
 type ResumeFormat = "html" | "markdown";
 
@@ -18,7 +22,11 @@ export async function proxyResume(
   format: ResumeFormat,
 ): Promise<Response> {
   const cache = event.platform?.caches.default as unknown as ResumeCache | undefined;
-  const cacheKey = new URL(format === "html" ? "/resume" : "/resume.md", event.url).toString();
+  const cachePath = format === "html" ? "/resume" : "/resume.md";
+  const cacheKey = new URL(
+    `${cachePath}?resume-cache=${RESUME_CACHE_VERSION}`,
+    event.url,
+  ).toString();
 
   if (cache) {
     try {
@@ -31,9 +39,11 @@ export async function proxyResume(
     }
   }
 
-  let response: Response;
+  let content: string | undefined;
+  let source: "upstream" | "fallback" = "fallback";
+
   try {
-    response = await event.fetch(RESUME_READER_URL, {
+    const response = await event.fetch(RESUME_READER_URL, {
       headers:
         format === "html"
           ? {
@@ -44,25 +54,30 @@ export async function proxyResume(
               "x-respond-with": "markdown",
             },
     });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "unknown network error";
-    return upstreamError(`Could not load the resume. The upstream request failed: ${message}`);
+
+    if (response.ok) {
+      const upstreamContent = await response.text();
+      if (upstreamContent.includes(RESUME_CONTENT_MARKER)) {
+        content = format === "html" ? prepareHtml(upstreamContent) : upstreamContent;
+        source = "upstream";
+      }
+    }
+  } catch {
+    // Serve the checked-in snapshot when the reader is unavailable.
   }
 
-  if (!response.ok) {
-    return upstreamError(
-      `Could not load the resume. The upstream service returned ${response.status}. The original resume is still available at ${RESUME_URL}`,
-    );
+  if (!content) {
+    content = format === "html" ? fallbackHtml() : fallbackMarkdown;
   }
 
-  const body = await response.text();
-  const content = format === "html" ? addNotionBaseUrl(body) : body;
+  const cacheTtl = source === "upstream" ? RESUME_CACHE_TTL : RESUME_FALLBACK_CACHE_TTL;
 
   const result = new Response(content, {
     headers: {
-      "cache-control": `public, max-age=${RESUME_CACHE_TTL}, stale-if-error=${RESUME_CACHE_TTL}`,
+      "cache-control": `public, max-age=${cacheTtl}, stale-if-error=${RESUME_CACHE_TTL}`,
       "content-type":
         format === "html" ? "text/html; charset=utf-8" : "text/markdown; charset=utf-8",
+      "x-resume-source": source,
     },
   });
 
@@ -77,16 +92,40 @@ export async function proxyResume(
   return result;
 }
 
-function addNotionBaseUrl(html: string): string {
-  return html.replace(/<head(\s[^>]*)?>/i, (head) => `${head}<base href="${RESUME_ORIGIN}/">`);
+function prepareHtml(html: string): string {
+  const withoutScripts = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
+  return withoutScripts.replace(
+    /<head(\s[^>]*)?>/i,
+    (head) => `${head}<base href="${RESUME_ORIGIN}/">`,
+  );
 }
 
-function upstreamError(message: string): Response {
-  return new Response(message, {
-    status: 502,
-    headers: {
-      "cache-control": "no-store",
-      "content-type": "text/plain; charset=utf-8",
-    },
-  });
+function fallbackHtml(): string {
+  const escapedMarkdown = fallbackMarkdown.replace(
+    /[&<>"']/g,
+    (character) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[character] ?? character,
+  );
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Heyya, this is my resume</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body { margin: 0; background: #191919; color: #f5f5f5; font: 16px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
+      main { max-width: 860px; margin: 0 auto; padding: 32px 24px 64px; }
+      pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+    </style>
+  </head>
+  <body><main><pre>${escapedMarkdown}</pre></main></body>
+</html>`;
 }
