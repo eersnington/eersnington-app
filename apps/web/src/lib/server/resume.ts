@@ -8,7 +8,7 @@ const RESUME_READER_URL = `https://r.jina.ai/${RESUME_URL}`;
 const RESUME_CACHE_TTL = 60 * 60 * 24;
 const RESUME_FALLBACK_CACHE_TTL = 60 * 5;
 const RESUME_CONTENT_MARKER = "Sreenarayanan Sreekanth";
-const RESUME_CACHE_VERSION = "v4";
+const RESUME_CACHE_VERSION = "v5";
 
 type ResumeFormat = "html" | "markdown";
 
