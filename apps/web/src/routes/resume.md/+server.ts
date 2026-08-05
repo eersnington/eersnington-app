@@ -1,5 +1,5 @@
-import { proxyResume } from "$lib/server/resume";
+import { proxyResumeMarkdown } from "$lib/server/resume";
 
 export function GET(event) {
-  return proxyResume(event, "markdown");
+  return proxyResumeMarkdown(event);
 }
