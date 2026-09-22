@@ -3,7 +3,7 @@ import type { Config } from "./types";
 const config: Config = {
   pageTitle: "Sree N | @eersnington",
   title: "Sree",
-  subtitle: "software engineer | web, typescript, zig, f1",
+  subtitle: "SWE @ rivet.gg | cooking, f1, music, game design",
   siteUrl: "https://www.eers.dev",
 
   links: [

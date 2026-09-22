@@ -3,7 +3,7 @@ use std::time::{Duration, Instant, SystemTime};
 pub const SKILL_RAW_URL: &str =
     "https://gist.githubusercontent.com/eersnington/4154c43469dba9aeb46e2632c86ec911/raw/SKILL.md";
 pub const CONTACT_EMAIL: &str = "hi@eers.dev";
-pub const SUBTITLE: &str = "software engineer | web, typescript, zig, f1";
+pub const SUBTITLE: &str = "SWE @ rivet.gg | cooking, f1, music, game design";
 pub const KEY_BUFFER_TIMEOUT: Duration = Duration::from_millis(1_500);
 pub const STATUS_TIMEOUT: Duration = Duration::from_secs(3);
 pub const MAX_KEY_BUFFER_LENGTH: usize = 10;

@@ -86,7 +86,7 @@ fn draw_home(frame: &mut Frame<'_>, area: Rect, app: &App, palette: Palette) {
         title_area,
     );
 
-    let subtitle = Paragraph::new(format!("{SUBTITLE} ▲"))
+    let subtitle = Paragraph::new(format!("{SUBTITLE} 🔩"))
         .alignment(Alignment::Center)
         .style(
             Style::default()

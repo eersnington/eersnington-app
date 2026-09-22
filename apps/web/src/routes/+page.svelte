@@ -229,7 +229,7 @@ const lineCount = $derived(
 				class="mb-8 px-4 py-2 text-center text-lg"
 				style="background-color: {theme.selection}; color: {theme.foreground};"
 			>
-				{config.subtitle} <span class="animate-pulse text-xl">▲</span>
+				{config.subtitle} <span class="animate-pulse text-xl">🔩</span>
 			</div>
 
 			<NavigationLinks
