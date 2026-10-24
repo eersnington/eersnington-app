@@ -1,0 +1,11 @@
+{
+  "name": "domain-redirects",
+  "account_id": "24de2a617a6739ba3ae9eea152a254a5",
+  "main": "src/redirect-worker.js",
+  "compatibility_date": "2026-10-24",
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "buttkindaitchy.com", "custom_domain": true },
+    { "pattern": "obby.sh", "custom_domain": true },
+  ],
+}
