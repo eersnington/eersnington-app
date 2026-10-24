@@ -20,16 +20,16 @@ const config: Config = {
       keybind: "gx",
     },
     {
-      id: "linkedin",
-      title: "LinkedIn",
-      url: "https://www.linkedin.com/in/sreenington",
-      keybind: "gli",
-    },
-    {
       id: "youtube",
       title: "YouTube",
       url: "https://youtube.com/@CrazyDanTHEMinecrafter",
       keybind: "gyt",
+    },
+    {
+      id: "linkedin",
+      title: "LinkedIn (don't bother)",
+      url: "https://www.linkedin.com/in/sreenington",
+      keybind: "gli",
     },
     {
       id: "email",
